@@ -3,6 +3,7 @@ import { Match } from "./db/entities/Match.js";
 import {Message} from "./db/entities/Message.js";
 import {User} from "./db/entities/User.js";
 import {ICreateUsersBody} from "./types.js";
+import {containsBadWords} from "./resources/badwordsfilter.js";
 
 async function DoggrRoutes(app: FastifyInstance, _options = {}) {
 	if (!app) {
@@ -41,6 +42,7 @@ async function DoggrRoutes(app: FastifyInstance, _options = {}) {
 	// CRUD
 	// C
 	app.post<{Body: ICreateUsersBody}>("/users", async (req, reply) => {
+		
 		const { name, email, petType} = req.body;
 		
 		try {
@@ -139,6 +141,12 @@ async function DoggrRoutes(app: FastifyInstance, _options = {}) {
 		const { email_from, email_to, message} = req.body;
 		
 		try {
+			// Test message against bad words
+			if(containsBadWords(message)) {
+				// new Error("Bad language");
+				return reply.status(406).send("A naughty word was detected in your message!");
+			}
+		
 			// Make sure both users exist
 			const sender = await req.em.findOne(User, { email: email_from });
 			const receiver = await req.em.findOne(User, { email: email_to });
