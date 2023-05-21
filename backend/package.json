@@ -11,6 +11,7 @@
 		"dev": "Runs the development server (locally)"
 	},
 	"dependencies": {
+		"dotenv": "^16.0.3",
 		"fastify": "^4.17.0"
 	},
 	"devDependencies": {
