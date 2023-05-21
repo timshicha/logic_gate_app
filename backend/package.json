@@ -1,5 +1,22 @@
 {
+	"name": "Logic Gate App",
+	"version": "0.0.1",
+	"description": "Logic Gate App backend",
+	"type": "module",
+	"main": "index.js",
+	"scripts": {
+		"dev": "nodemon --no-warnings=ExperimentalWarning src/index.ts"
+	},
+	"scriptComments": {
+		"dev": "Runs the development server (locally)"
+	},
 	"dependencies": {
 		"fastify": "^4.17.0"
+	},
+	"devDependencies": {
+		"@swc/core": "^1.3.59",
+		"nodemon": "^2.0.22",
+		"ts-morph": "^18.0.0",
+		"ts-node": "^10.9.1"
 	}
 }
