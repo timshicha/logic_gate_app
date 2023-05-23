@@ -1,4 +1,5 @@
-import {Entity, ManyToOne, Property, Ref} from "@mikro-orm/core";
+import {Entity, ManyToOne, Property } from "@mikro-orm/core";
+import type { Ref, Rel } from "@mikro-orm/core";
 import {AppBaseEntity} from "./AppBaseEntity.js";
 import {User} from "./User.js";
 
