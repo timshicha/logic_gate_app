@@ -6,7 +6,7 @@ import {CircuitMap} from "./CircuitMap.js";
 export class User extends AppBaseEntity {
 	@Property()
 	@Unique()
-	username!: string;
+	email!: string;
 	
 	@OneToMany(
 		() => CircuitMap,

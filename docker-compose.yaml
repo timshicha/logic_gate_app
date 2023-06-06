@@ -9,11 +9,11 @@ services:
     volumes:
       - db:/var/lib/postgresql/data
     environment:
-      - POSTGRES_USER=doggr
-      - POSTGRES_PASSWORD=doggr
-      - POSTGRES_DB=doggr
+      - POSTGRES_USER=logicgateapp
+      - POSTGRES_PASSWORD=logicgateapp
+      - POSTGRES_DB=logicgateapp
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U doggr"]
+      test: ["CMD-SHELL", "pg_isready -U logicgateapp"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -27,9 +27,9 @@ services:
     environment:
       - DB_HOST=postgres
       - DB_PORT=5432
-      - DB_NAME=doggr
-      - DB_USER=doggr
-      - DB_PASS=doggr
+      - DB_NAME=logicgateapp
+      - DB_USER=logicgateapp
+      - DB_PASS=logicgateapp
       - PORT=8080
       - HOST=0.0.0.0
       - PASSWORD=password

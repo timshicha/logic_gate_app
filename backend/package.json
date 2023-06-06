@@ -33,14 +33,16 @@
 		"db:reset": "Completely updates our database to match our source code"
 	},
 	"dependencies": {
-		"dotenv": "^16.0.3",
-		"fastify": "^4.17.0",
 		"@mikro-orm/cli": "5.7.2",
 		"@mikro-orm/core": "5.7.2",
 		"@mikro-orm/migrations": "5.7.2",
 		"@mikro-orm/postgresql": "5.7.2",
 		"@mikro-orm/reflection": "5.7.2",
-		"@mikro-orm/seeder": "5.7.2"
+		"@mikro-orm/seeder": "5.7.2",
+		"dotenv": "^16.0.3",
+		"fastify": "^4.17.0",
+		"fastify-plugin": "^4.5.0",
+		"firebase": "^9.22.1"
 	},
 	"devDependencies": {
 		"@faker-js/faker": "^8.0.1",
