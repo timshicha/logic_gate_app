@@ -42,4 +42,20 @@ export function CircuitMapRoutesInit(app: FastifyInstance) {
 			reply.status(500).send(err);
 		}
 	});
+	
+	// Find a map
+	app.search("/circuitmaps", async (req, reply) => {
+		// @ts-ignore
+		const { email, mapTitle } = req.body;
+		// Find the map
+		try {
+			const user = await req.em.findOne(User, {email: email});
+			const map = await req.em.findOne(CircuitMap, {
+				owner: user, title: mapTitle
+			});
+			return reply.send(map);
+		} catch (err) {
+			reply.status(500).send(err);
+		}
+	})
 }
