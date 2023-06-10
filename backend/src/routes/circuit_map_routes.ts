@@ -1,7 +1,8 @@
 import {FastifyInstance} from "fastify";
 import {CircuitMap} from "../db/entities/CircuitMap.js";
 import { User } from "../db/entities/User.js";
-import { wrap } from '@mikro-orm/core';
+import {Collection, wrap} from '@mikro-orm/core';
+import { selectMap} from "../utils/collectionTools.js";
 
 export function CircuitMapRoutesInit(app: FastifyInstance) {
 	// Route to create a map for a user
@@ -31,10 +32,9 @@ export function CircuitMapRoutesInit(app: FastifyInstance) {
 		let { email, mapTitle, newMap } = req.body;
 		// Modify the map
 		try {
-			const user = await req.em.findOne(User, {email: email});
-			const map = await req.em.findOne(CircuitMap, {
-				owner: user, title: mapTitle
-			});
+			const user = await req.em.findOne(User, {email: email}, {populate: ["circuitMaps"]});
+			// Get the user's map
+			const map = selectMap(user.circuitMaps, mapTitle);
 			await wrap(map).assign({ circuitMap: newMap });
 			await req.em.flush();
 			return reply.send(map);
@@ -49,10 +49,10 @@ export function CircuitMapRoutesInit(app: FastifyInstance) {
 		const { email, mapTitle } = req.body;
 		// Find the map
 		try {
-			const user = await req.em.findOne(User, {email: email});
-			const map = await req.em.findOne(CircuitMap, {
-				owner: user, title: mapTitle
-			});
+			// Find user first
+			const user = await req.em.findOne(User, {email: email}, {populate: ["circuitMaps"]});
+			// Get the user's map
+			const map = selectMap(user.circuitMaps, mapTitle);
 			return reply.send(map);
 		} catch (err) {
 			reply.status(500).send(err);
