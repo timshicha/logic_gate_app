@@ -1,5 +1,5 @@
 import {FastifyInstance} from "fastify";
-import { User } from "../src/db/entities/User.js";
+import { User } from "../db/entities/User.js";
 
 export function UserRoutesInit(app: FastifyInstance) {
 	// Route that adds a user by a given email

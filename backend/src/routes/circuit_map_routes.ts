@@ -1,6 +1,6 @@
 import {FastifyInstance} from "fastify";
-import {CircuitMap} from "../src/db/entities/CircuitMap.js";
-import { User } from "../src/db/entities/User.js";
+import {CircuitMap} from "../db/entities/CircuitMap.js";
+import { User } from "../db/entities/User.js";
 import { wrap } from '@mikro-orm/core';
 
 export function CircuitMapRoutesInit(app: FastifyInstance) {
@@ -41,5 +41,5 @@ export function CircuitMapRoutesInit(app: FastifyInstance) {
 		} catch (err) {
 			reply.status(500).send(err);
 		}
-	})
+	});
 }

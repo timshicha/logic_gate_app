@@ -1,5 +1,5 @@
 import Fastify from "fastify";
-import LogicGateAppRoutes from "../routes/routes.js";
+import LogicGateAppRoutes from "./routes/routes.js";
 import {FastifyMikroOrmPlugin} from "./mikro.js";
 import config from "./db/mikro-orm.config.js";
 
