@@ -3,8 +3,8 @@ import {CircuitMap} from "../src/db/entities/CircuitMap.js";
 import { User } from "../src/db/entities/User.js";
 
 export function CircuitMapRoutesInit(app: FastifyInstance) {
-	// Route that adds a user by a given email
-	app.post("/circuitmaps/create", async (req, reply) => {
+	// Route to create a map for a user
+	app.post("/circuitmaps", async (req, reply) => {
 		// @ts-ignore
 		let { email, mapTitle, initialMap } = req.body;
 		// If no initial map provided, make empty initial map
