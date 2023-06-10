@@ -1,6 +1,7 @@
 import Fastify from "fastify";
+import {FastifySearchHttpMethodPlugin} from "./plugins/http_search.js";
 import LogicGateAppRoutes from "./routes/routes.js";
-import {FastifyMikroOrmPlugin} from "./mikro.js";
+import {FastifyMikroOrmPlugin} from "./plugins/mikro.js";
 import config from "./db/mikro-orm.config.js";
 
 
@@ -34,6 +35,7 @@ const app = Fastify({
 	logger: envToLogger[process.env.NOVE_ENV]
 });
 
+await app.register(FastifySearchHttpMethodPlugin);
 await app.register(FastifyMikroOrmPlugin, config);
 await app.register(LogicGateAppRoutes, {});
 
