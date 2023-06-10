@@ -11,7 +11,7 @@ export class User extends AppBaseEntity {
 	@OneToMany(
 		() => CircuitMap,
 		circuitMap => circuitMap.owner,
-		{cascade: [Cascade.PERSIST, Cascade.REMOVE]}
+		{cascade: [Cascade.PERSIST, Cascade.REMOVE], orphanRemoval: true}
 	)
 	circuitMaps!: Collection<CircuitMap>;
 }

@@ -57,5 +57,23 @@ export function CircuitMapRoutesInit(app: FastifyInstance) {
 		} catch (err) {
 			reply.status(500).send(err);
 		}
+	});
+	
+	// Delete a map
+	app.delete("/circuitmaps", async (req, reply) => {
+		// @ts-ignore
+		const { email, mapTitle } = req.body;
+		// Find a map
+		try {
+			// Fnd the user and map
+			const user = await req.em.findOne(User, {email: email}, {populate: ["circuitMaps"]});
+			// Get the user's map
+			const map = selectMap(user.circuitMaps, mapTitle);
+			user.circuitMaps.remove(map);
+			req.em.flush();
+			return map;
+		} catch (err) {
+			reply.status(500).send(err);
+		}
 	})
 }
