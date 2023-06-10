@@ -2,6 +2,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 import { FastifyInstance} from "fastify";
+import {CircuitMapRoutesInit} from "./circuit_map_routes.js";
 import { UserRoutesInit } from "./user_routes.js";
 
 async function LogicGateAppRoutes(app: FastifyInstance, _options={}) {
@@ -10,7 +11,8 @@ async function LogicGateAppRoutes(app: FastifyInstance, _options={}) {
 	}
 	
 	UserRoutesInit(app);
-	
+	CircuitMapRoutesInit(app);
+
 	app.get("/", async (req, reply) => {
 		reply.send("hi");
 	})

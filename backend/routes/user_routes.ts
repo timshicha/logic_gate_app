@@ -3,7 +3,8 @@ import { User } from "../src/db/entities/User.js";
 
 export function UserRoutesInit(app: FastifyInstance) {
 	// Route that adds a user by a given email
-	app.post("/create", async (req, reply) => {
+	app.post("/users/create", async (req, reply) => {
+		// @ts-ignore
 		const { email } = req.body;
 		// Make sure this user does not already exist
 		try {
