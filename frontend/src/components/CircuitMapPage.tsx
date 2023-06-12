@@ -11,13 +11,17 @@ export function CircuitMapPage() {
 	// How many pixels each "block" should be.
 	const UNIT_SIZE = 15;
 	const canvasRef = useRef(null);
+	const [clientX, setClientX] = useState(0);
+	const [clientY, setClientY] = useState(0);
 
 	useEffect(() => {
 		// Add a listener to detect canvas clicks
 		canvasRef.current.addEventListener("mousedown", event => handleCanvasClick(event));
+		canvasRef.current.addEventListener("mousemove", event => handleCanvasMove(event));
 
 		return () => {
 			canvasRef.current.removeEventListener("mousedown", event => handleCanvasClick(event));
+			canvasRef.current.removeEventListener("mousemove", event => handleCanvasMove(event));
 		}
 	});
 
@@ -45,6 +49,23 @@ export function CircuitMapPage() {
 		const item = document.getElementById("item").value;
 		if(item !== "wire") {
 			draw(item, x,y, null, null, COLORS.BLACK);
+		}
+	}
+
+	// When the user moves in the canvas, see if they hovered over a new grid intersection.
+	// If so, update the canvas.
+	function handleCanvasMove(event) {
+		const item = document.getElementById("item").value;
+		const rect = canvasRef.current.getBoundingClientRect();
+		const coordX = event.clientX - rect.left;
+		const coordY = event.clientY - rect.top;
+		let [x, y] = readCanvasClick(coordX, coordY);
+		if(x !== clientX || y !== clientY) {
+			canvasRef.current.getContext("2d").clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+			drawCanvasGridLines(COLORS.BLACK);
+			draw(item, x, y, null, null, COLORS.BLACK);
+			setClientX(x);
+			setClientY(y);
 		}
 	}
 
