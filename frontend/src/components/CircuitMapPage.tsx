@@ -10,18 +10,20 @@ export function CircuitMapPage() {
 	const CANVAS_UNITS = 40;
 	// How many pixels each "block" should be.
 	const UNIT_SIZE = 15;
-	const canvasRef = useRef(null);
+	const mainCanvasRef = useRef(null);
+	const gridCanvasRef = useRef(null);
+	const hintCanvasRef = useRef(null);
 	const [clientX, setClientX] = useState(0);
 	const [clientY, setClientY] = useState(0);
 
 	useEffect(() => {
 		// Add a listener to detect canvas clicks
-		canvasRef.current.addEventListener("mousedown", event => handleCanvasClick(event));
-		canvasRef.current.addEventListener("mousemove", event => handleCanvasMove(event));
+		mainCanvasRef.current.addEventListener("mousedown", event => handleCanvasClick(event));
+		mainCanvasRef.current.addEventListener("mousemove", event => handleCanvasMove(event));
 
 		return () => {
-			canvasRef.current.removeEventListener("mousedown", event => handleCanvasClick(event));
-			canvasRef.current.removeEventListener("mousemove", event => handleCanvasMove(event));
+			mainCanvasRef.current.removeEventListener("mousedown", event => handleCanvasClick(event));
+			mainCanvasRef.current.removeEventListener("mousemove", event => handleCanvasMove(event));
 		}
 	});
 
@@ -38,7 +40,7 @@ export function CircuitMapPage() {
 	function handleCanvasClick(event) {
 		// The following code detects canvas clicks.
 		// Reference: https://www.geeksforgeeks.org/how-to-get-the-coordinates-of-a-mouse-click-on-a-canvas-element/
-		const rect = canvasRef.current.getBoundingClientRect();
+		const rect = mainCanvasRef.current.getBoundingClientRect();
 		const coordX = event.clientX - rect.left;
 		const coordY = event.clientY - rect.top;
 
@@ -48,7 +50,7 @@ export function CircuitMapPage() {
 		// If placement is not wire, then place where the user clicks
 		const item = document.getElementById("item").value;
 		if(item !== "wire") {
-			draw(item, x,y, null, null, COLORS.BLACK);
+			draw(mainCanvasRef.current, item, x,y, null, null, COLORS.BLACK);
 		}
 	}
 
@@ -56,14 +58,13 @@ export function CircuitMapPage() {
 	// If so, update the canvas.
 	function handleCanvasMove(event) {
 		const item = document.getElementById("item").value;
-		const rect = canvasRef.current.getBoundingClientRect();
+		const rect = hintCanvasRef.current.getBoundingClientRect();
 		const coordX = event.clientX - rect.left;
 		const coordY = event.clientY - rect.top;
 		let [x, y] = readCanvasClick(coordX, coordY);
 		if(x !== clientX || y !== clientY) {
-			canvasRef.current.getContext("2d").clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
-			drawCanvasGridLines(COLORS.BLACK);
-			draw(item, x, y, null, null, COLORS.BLACK);
+			hintCanvasRef.current.getContext("2d").clearRect(0, 0, mainCanvasRef.current.width, mainCanvasRef.current.height);
+			draw(hintCanvasRef.current, item, x, y, null, null, COLORS.BLACK);
 			setClientX(x);
 			setClientY(y);
 		}
@@ -71,7 +72,7 @@ export function CircuitMapPage() {
 
 	// Draw the grid lines on the canvas
 	function drawCanvasGridLines(color) {
-		const context = canvasRef.current.getContext("2d");
+		const context = gridCanvasRef.current.getContext("2d");
 		context.beginPath();
 		// Draw horizontal lines
 		for (let i = 0; i <= CANVAS_UNITS; i++) {
@@ -84,14 +85,14 @@ export function CircuitMapPage() {
 			context.lineTo(i * UNIT_SIZE, CANVAS_UNITS * UNIT_SIZE);
 		}
 		context.strokeStyle = color;
-		context.lineWidth = 0.3;
+		context.lineWidth = 0.1;
 		context.stroke();
 	}
 
 	// Draw the specified shape.
 	// If wire, x2 and y2 must also be specified.
-	function draw(obj, x1, y1, x2, y2, color) {
-		const context = canvasRef.current.getContext("2d");
+	function draw(canvas, obj, x1, y1, x2, y2, color) {
+		const context = canvas.getContext("2d");
 		context.beginPath();
 		if(obj === "AND") {
 			context.moveTo((x1 - 1) * UNIT_SIZE, (y1 - 1) * UNIT_SIZE);
@@ -130,7 +131,7 @@ export function CircuitMapPage() {
 		const y2 = parseInt(document.getElementById("y2").value);
 		const item = document.getElementById("item").value;
 
-		draw(item, x1, y1, x2, y2, COLORS.BLACK);
+		draw(mainCanvasRef.current, item, x1, y1, x2, y2, COLORS.BLACK);
 
 		console.log(x1, x2, y1, y2, item);
 	}
@@ -158,7 +159,11 @@ export function CircuitMapPage() {
 			<br />
 			<button className="bg-gray-600" onClick={place}>Place</button>
 
-			<canvas ref={canvasRef} className={`bg-red-600`} width={CANVAS_UNITS * UNIT_SIZE} height={CANVAS_UNITS * UNIT_SIZE}></canvas>
+			<div className="relative">
+				<canvas ref={gridCanvasRef} className="absolute pointer-events-none" width={CANVAS_UNITS * UNIT_SIZE} height={CANVAS_UNITS * UNIT_SIZE}></canvas>
+				<canvas ref={mainCanvasRef} className="bg-red-600 absolute" width={CANVAS_UNITS * UNIT_SIZE} height={CANVAS_UNITS * UNIT_SIZE}></canvas>
+				<canvas ref={hintCanvasRef} className="absolute pointer-events-none" width={CANVAS_UNITS * UNIT_SIZE} height={CANVAS_UNITS * UNIT_SIZE}></canvas>
+			</div>
 		</>
 	);
 }
