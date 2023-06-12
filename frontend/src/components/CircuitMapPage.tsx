@@ -5,9 +5,9 @@ export function CircuitMapPage() {
 	// How many "blocks" the canvas should be. The more blocks, the
 	// bigger the grid. This allows the user to place gates and wires
 	// on a bigger board.
-	const CANVAS_UNITS = 35;
+	const CANVAS_UNITS = 60;
 	// How many pixels each "block" should be.
-	const UNIT_SIZE = 20;
+	const UNIT_SIZE = 10;
 	const canvasRef = useRef(null);
 
 	// Place a wire given two coordinates
@@ -49,6 +49,21 @@ export function CircuitMapPage() {
 		context.fill();
 	}
 
+	function placeNot(x, y) {
+		const context = canvasRef.current.getContext("2d");
+		context.beginPath();
+		context.moveTo((x + 0.5) * UNIT_SIZE, y * UNIT_SIZE);
+		context.lineTo((x - 1) * UNIT_SIZE, (y - 1) * UNIT_SIZE);
+		context.lineTo((x - 1) * UNIT_SIZE, (y + 1) * UNIT_SIZE);
+		context.lineTo((x + 0.5) * UNIT_SIZE, y * UNIT_SIZE);
+		context.arc((x + 0.75) * UNIT_SIZE, y * UNIT_SIZE, 0.25 * UNIT_SIZE, Math.PI, 3 * Math.PI, false);
+		context.strokeStyle = "#000000";
+		context.fillStyle = "#000000";
+		context.lineWidth = 3;
+		context.stroke();
+		context.fill();
+	}
+
 	function place() {
 		const x1 = parseInt(document.getElementById("x1").value);
 		const x2 = parseInt(document.getElementById("x2").value);
@@ -64,6 +79,9 @@ export function CircuitMapPage() {
 		}
 		else if(item === "OR") {
 			placeOr(x1, y1);
+		}
+		else if(item === "NOT") {
+			placeNot(x1, y1);
 		}
 		console.log(x1, x2, y1, y2, item);
 	}
