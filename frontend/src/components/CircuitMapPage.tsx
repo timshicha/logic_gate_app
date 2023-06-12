@@ -95,8 +95,12 @@ export function CircuitMapPage() {
 			hintCanvasRef.current.getContext("2d").clearRect(0, 0, mainCanvasRef.current.width, mainCanvasRef.current.height);
 			// Wires get special treatment
 			if(toolInHand === "wire") {
+				// If we have a wire start
 				if(wireStart[0] !== null && wireStart[1] !== null) {
 					draw(hintCanvasRef.current, toolInHand, wireStart[0], wireStart[1], clientPos[0], clientPos[1], COLORS.DARK_GRAY);
+				}
+				else {
+					draw(hintCanvasRef.current, toolInHand, clientPos[0], clientPos[1], clientPos[0], clientPos[1], COLORS.DARK_GRAY);
 				}
 			}
 			else {
