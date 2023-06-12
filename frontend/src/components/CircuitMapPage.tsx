@@ -40,6 +40,12 @@ export function CircuitMapPage() {
 
 		let [x, y] = readCanvasClick(coordX, coordY);
 		console.log(x, y);
+
+		// If placement is not wire, then place where the user clicks
+		const item = document.getElementById("item").value;
+		if(item !== "wire") {
+			draw(item, x,y, null, null, COLORS.BLACK);
+		}
 	}
 
 	// Draw the grid lines on the canvas
