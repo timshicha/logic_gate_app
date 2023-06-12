@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, {useEffect, useRef, useState} from "react";
 import { COLORS } from "@/utils/constants.tsx";
 
 export function CircuitMapPage() {
@@ -7,10 +7,59 @@ export function CircuitMapPage() {
 	// How many "blocks" the canvas should be. The more blocks, the
 	// bigger the grid. This allows the user to place gates and wires
 	// on a bigger board.
-	const CANVAS_UNITS = 60;
+	const CANVAS_UNITS = 40;
 	// How many pixels each "block" should be.
-	const UNIT_SIZE = 10;
+	const UNIT_SIZE = 15;
 	const canvasRef = useRef(null);
+
+	useEffect(() => {
+		// Add a listener to detect canvas clicks
+		canvasRef.current.addEventListener("mousedown", event => handleCanvasClick(event));
+
+		return () => {
+			canvasRef.current.removeEventListener("mousedown", event => handleCanvasClick(event));
+		}
+	});
+
+	// Given two coordinates on the canvas, find the nearest grid intersection and
+	// return its x and y.
+	function readCanvasClick(x, y) {
+		// Round nearest reference: https://1loc.dev/math/round-a-number-to-the-nearest-multiple-of-a-given-value/
+		function roundNearest (value, nearest) {
+			return Math.round(value / nearest) * nearest;
+		}
+		return [(roundNearest(x, UNIT_SIZE) / UNIT_SIZE), (roundNearest(y, UNIT_SIZE) / UNIT_SIZE)];
+	}
+
+	function handleCanvasClick(event) {
+		// The following code detects canvas clicks.
+		// Reference: https://www.geeksforgeeks.org/how-to-get-the-coordinates-of-a-mouse-click-on-a-canvas-element/
+		const rect = canvasRef.current.getBoundingClientRect();
+		const coordX = event.clientX - rect.left;
+		const coordY = event.clientY - rect.top;
+
+		let [x, y] = readCanvasClick(coordX, coordY);
+		console.log(x, y);
+	}
+
+	// Draw the grid lines on the canvas
+	function drawCanvasGridLines(color) {
+		const context = canvasRef.current.getContext("2d");
+		context.beginPath();
+		// Draw horizontal lines
+		for (let i = 0; i <= CANVAS_UNITS; i++) {
+			context.moveTo(0, i * UNIT_SIZE);
+			context.lineTo(CANVAS_UNITS * UNIT_SIZE, i * UNIT_SIZE);
+		}
+		// Draw vertical lines
+		for (let i = 0; i <= CANVAS_UNITS; i++) {
+			context.moveTo(i * UNIT_SIZE, 0);
+			context.lineTo(i * UNIT_SIZE, CANVAS_UNITS * UNIT_SIZE);
+		}
+		context.strokeStyle = color;
+		context.lineWidth = 0.3;
+		context.stroke();
+	}
 
 	// Draw the specified shape.
 	// If wire, x2 and y2 must also be specified.
@@ -62,6 +111,8 @@ export function CircuitMapPage() {
 	return (
 		<>
 			Circuit Map Page
+			<br />
+			<button onClick={() => drawCanvasGridLines(COLORS.GRAY)}>Set up</button>
 			<br />
 			x1: <input type="number" id="x1"/>
 			<br />
