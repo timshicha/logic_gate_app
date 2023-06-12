@@ -1,6 +1,8 @@
 import React, { useRef, useState } from "react";
+import { COLORS } from "@/utils/constants.tsx";
 
 export function CircuitMapPage() {
+
 
 	// How many "blocks" the canvas should be. The more blocks, the
 	// bigger the grid. This allows the user to place gates and wires
@@ -10,56 +12,37 @@ export function CircuitMapPage() {
 	const UNIT_SIZE = 10;
 	const canvasRef = useRef(null);
 
-	// Place a wire given two coordinates
-	function placeWire(x1, y1, x2, y2) {
+	// Draw the specified shape.
+	// If wire, x2 and y2 must also be specified.
+	function draw(obj, x1, y1, x2, y2, color) {
 		const context = canvasRef.current.getContext("2d");
 		context.beginPath();
-		context.moveTo(x1 * UNIT_SIZE, y1 * UNIT_SIZE);
-		context.lineTo(x2 * UNIT_SIZE, y2 * UNIT_SIZE);
-		context.strokeStyle = "#000000";
-		context.fillStyle = "#000000";
-		context.lineWidth = 3;
-		context.stroke();
-	}
+		if(obj === "AND") {
+			context.moveTo((x1 - 1) * UNIT_SIZE, (y1 - 1) * UNIT_SIZE);
+			context.lineTo((x1 - 1) * UNIT_SIZE, (y1 + 1) * UNIT_SIZE);
+			context.arc(x1 * UNIT_SIZE, y1 * UNIT_SIZE, UNIT_SIZE, Math.PI / 2, 3 * Math.PI / 2, true);
+			context.lineTo((x1 - 1) * UNIT_SIZE, (y1 - 1) * UNIT_SIZE);
+		}
+		else if(obj === "OR") {
+			context.arc((x1 - 2) * UNIT_SIZE, y1 * UNIT_SIZE, 1.5 * UNIT_SIZE, 7 * Math.PI / 4 + 0.05, Math.PI / 4 - 0.05, false);
+			context.arc(x1 * UNIT_SIZE, y1 * UNIT_SIZE, UNIT_SIZE, Math.PI / 2, 3 * Math.PI / 2, true);
+			context.lineTo((x1 - 1) * UNIT_SIZE, (y1 - 1) * UNIT_SIZE);
+		}
+		else if(obj === "NOT") {
+			context.moveTo((x1 + 0.5) * UNIT_SIZE, y1 * UNIT_SIZE);
+			context.lineTo((x1 - 1) * UNIT_SIZE, (y1 - 1) * UNIT_SIZE);
+			context.lineTo((x1 - 1) * UNIT_SIZE, (y1 + 1) * UNIT_SIZE);
+			context.lineTo((x1 + 0.5) * UNIT_SIZE, y1 * UNIT_SIZE);
+			context.arc((x1 + 0.75) * UNIT_SIZE, y1 * UNIT_SIZE, 0.25 * UNIT_SIZE, Math.PI, 3 * Math.PI, false);
 
-	function placeAnd(x, y) {
-		const context = canvasRef.current.getContext("2d");
-		context.beginPath();
-		context.moveTo((x - 1) * UNIT_SIZE, (y - 1) * UNIT_SIZE);
-		context.lineTo((x - 1) * UNIT_SIZE, (y + 1) * UNIT_SIZE);
-		context.arc(x * UNIT_SIZE, y * UNIT_SIZE, UNIT_SIZE, Math.PI / 2, 3 * Math.PI / 2, true);
-		context.lineTo((x - 1) * UNIT_SIZE, (y - 1) * UNIT_SIZE);
-		context.strokeStyle = "#000000";
-		context.fillStyle = "#000000";
-		context.lineWidth = 3;
-		context.stroke();
-		context.fill();
-	}
-
-	function placeOr(x, y) {
-		const context = canvasRef.current.getContext("2d");
-		context.beginPath();
-		context.arc((x - 2) * UNIT_SIZE, y * UNIT_SIZE, 1.5 * UNIT_SIZE, 7 * Math.PI / 4 + 0.05, Math.PI / 4 - 0.05, false);
-		context.arc(x * UNIT_SIZE, y * UNIT_SIZE, UNIT_SIZE, Math.PI / 2, 3 * Math.PI / 2, true);
-		context.lineTo((x - 1) * UNIT_SIZE, (y - 1) * UNIT_SIZE);
-		context.strokeStyle = "#000000";
-		context.fillStyle = "#000000";
-		context.lineWidth = 3;
-		context.stroke();
-		context.fill();
-	}
-
-	function placeNot(x, y) {
-		const context = canvasRef.current.getContext("2d");
-		context.beginPath();
-		context.moveTo((x + 0.5) * UNIT_SIZE, y * UNIT_SIZE);
-		context.lineTo((x - 1) * UNIT_SIZE, (y - 1) * UNIT_SIZE);
-		context.lineTo((x - 1) * UNIT_SIZE, (y + 1) * UNIT_SIZE);
-		context.lineTo((x + 0.5) * UNIT_SIZE, y * UNIT_SIZE);
-		context.arc((x + 0.75) * UNIT_SIZE, y * UNIT_SIZE, 0.25 * UNIT_SIZE, Math.PI, 3 * Math.PI, false);
-		context.strokeStyle = "#000000";
-		context.fillStyle = "#000000";
-		context.lineWidth = 3;
+		}
+		else if(obj === "wire") {
+			context.moveTo(x1 * UNIT_SIZE, y1 * UNIT_SIZE);
+			context.lineTo(x2 * UNIT_SIZE, y2 * UNIT_SIZE);
+		}
+		context.strokeStyle = color;
+		context.fillStyle = color;
+		context.lineWidth = 1;
 		context.stroke();
 		context.fill();
 	}
@@ -71,18 +54,8 @@ export function CircuitMapPage() {
 		const y2 = parseInt(document.getElementById("y2").value);
 		const item = document.getElementById("item").value;
 
-		if(item === "wire") {
-			placeWire(x1, y1, x2, y2);
-		}
-		else if(item === "AND") {
-			placeAnd(x1, y1);
-		}
-		else if(item === "OR") {
-			placeOr(x1, y1);
-		}
-		else if(item === "NOT") {
-			placeNot(x1, y1);
-		}
+		draw(item, x1, y1, x2, y2, COLORS.BLACK);
+
 		console.log(x1, x2, y1, y2, item);
 	}
 
