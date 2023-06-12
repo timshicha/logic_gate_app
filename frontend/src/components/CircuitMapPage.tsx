@@ -68,7 +68,7 @@ export function CircuitMapPage() {
 			// Otherwise, place the wire
 			else {
 
-				draw(mainCanvasRef.current, toolInHand, wireStart[0], wireStart[1], clientPos[0], clientPos[1], COLORS.BLACK);
+				draw(mainCanvasRef.current, toolInHand, wireStart[0], wireStart[1], clientPos[0], clientPos[1], false, false);
 				wireStart[0] = null;
 				wireStart[1] = null;
 				hintCanvasRef.current.getContext("2d").clearRect(0, 0, mainCanvasRef.current.width, mainCanvasRef.current.height);
@@ -76,7 +76,7 @@ export function CircuitMapPage() {
 		}
 		else {
 			// Clear hint canvas
-			draw(mainCanvasRef.current, toolInHand, clientPos[0],clientPos[1], null, null, COLORS.BLACK);
+			draw(mainCanvasRef.current, toolInHand, clientPos[0],clientPos[1], null, null, false, false);
 			hintCanvasRef.current.getContext("2d").clearRect(0, 0, mainCanvasRef.current.width, mainCanvasRef.current.height);
 		}
 	}
@@ -97,14 +97,14 @@ export function CircuitMapPage() {
 			if(toolInHand === "wire") {
 				// If we have a wire start
 				if(wireStart[0] !== null && wireStart[1] !== null) {
-					draw(hintCanvasRef.current, toolInHand, wireStart[0], wireStart[1], clientPos[0], clientPos[1], COLORS.DARK_GRAY);
+					draw(hintCanvasRef.current, toolInHand, wireStart[0], wireStart[1], clientPos[0], clientPos[1], false, true);
 				}
 				else {
-					draw(hintCanvasRef.current, toolInHand, clientPos[0], clientPos[1], clientPos[0], clientPos[1], COLORS.DARK_GRAY);
+					draw(hintCanvasRef.current, toolInHand, clientPos[0], clientPos[1], clientPos[0], clientPos[1], false, true);
 				}
 			}
 			else {
-				draw(hintCanvasRef.current, toolInHand, clientPos[0], clientPos[1], null, null, COLORS.DARK_GRAY);
+				draw(hintCanvasRef.current, toolInHand, clientPos[0], clientPos[1], null, null, false, true);
 			}
 		}
 	}
@@ -131,17 +131,9 @@ export function CircuitMapPage() {
 
 	// Draw the specified shape.
 	// If wire, x2 and y2 must also be specified.
-	function draw(canvas, obj, x1, y1, x2, y2, color) {
+	function draw(canvas, obj, x1, y1, x2, y2, power=false, hint=false) {
 		const context = canvas.getContext("2d");
-		function stroke (fill = false) {
-			context.strokeStyle = color;
-			context.fillStyle = color;
-			context.lineWidth = 2;
-			context.stroke();
-			if(fill) {
-				context.fill();
-			}
-		}
+		context.lineWidth = 2;
 
 		context.beginPath();
 		if(obj === "AND") {
@@ -149,36 +141,72 @@ export function CircuitMapPage() {
 			context.lineTo((x1 - 1) * UNIT_SIZE, (y1 + 1) * UNIT_SIZE);
 			context.arc(x1 * UNIT_SIZE, y1 * UNIT_SIZE, UNIT_SIZE, Math.PI / 2, 3 * Math.PI / 2, true);
 			context.lineTo((x1 - 1) * UNIT_SIZE, (y1 - 1) * UNIT_SIZE);
-			stroke();
+			context.strokeStyle = COLORS.BLACK;
+			if(hint) {
+				context.strokeStyle = COLORS.DARK_GRAY;
+			}
+			context.stroke();
 		}
 		else if(obj === "OR") {
 			context.arc((x1 - 2) * UNIT_SIZE, y1 * UNIT_SIZE, 1.5 * UNIT_SIZE, 7 * Math.PI / 4 + 0.05, Math.PI / 4 - 0.05, false);
 			context.arc(x1 * UNIT_SIZE, y1 * UNIT_SIZE, UNIT_SIZE, Math.PI / 2, 3 * Math.PI / 2, true);
 			context.lineTo((x1 - 1) * UNIT_SIZE, (y1 - 1) * UNIT_SIZE);
-			stroke();
+			context.strokeStyle = COLORS.BLACK;
+			if(hint) {
+				context.strokeStyle = COLORS.DARK_GRAY;
+			}
+			context.stroke();
 		}
 		else if(obj === "NOT") {
 			context.moveTo((x1 + 1/3) * UNIT_SIZE, y1 * UNIT_SIZE);
 			context.lineTo((x1 - 1) * UNIT_SIZE, (y1 - 1) * UNIT_SIZE);
 			context.lineTo((x1 - 1) * UNIT_SIZE, (y1 + 1) * UNIT_SIZE);
 			context.closePath();
-			stroke();
-			// context.lineTo((x1 + 1/3) * UNIT_SIZE, y1 * UNIT_SIZE);
+			if(hint) {
+				context.strokeStyle = COLORS.DARK_GRAY;
+			}
+			context.strokeStyle = COLORS.BLACK;
+			context.stroke();
 			context.arc((x1 + 2/3) * UNIT_SIZE, y1 * UNIT_SIZE, 1/3 * UNIT_SIZE, Math.PI, 4 * Math.PI, false);
-			stroke();
+			context.stroke();
+		}
+		else if(obj === "light") {
+			context.moveTo(x1 * UNIT_SIZE, (y1 + 1) * UNIT_SIZE);
+			context.lineTo(x1 * UNIT_SIZE, (y1 + 0.5) * UNIT_SIZE);
+			context.strokeStyle = COLORS.BLACK;
+			if(hint) {
+				context.strokeStyle = COLORS.DARK_GRAY;
+			}
+			context.stroke();
+			context.beginPath();
+			context.lineTo((x1 - 1) * UNIT_SIZE, (y1 + 0.5) * ( UNIT_SIZE));
+			context.lineTo((x1 - 1) * UNIT_SIZE, y1 * UNIT_SIZE);
+			context.arc(x1 * UNIT_SIZE, y1 * UNIT_SIZE, 1 * UNIT_SIZE, Math.PI, 0, false);
+			context.lineTo((x1 + 1) * UNIT_SIZE, (y1 + 0.5) * UNIT_SIZE);
+			context.closePath();
+			context.stroke();
 		}
 		else if(obj === "wire") {
 			context.moveTo(x1 * UNIT_SIZE, y1 * UNIT_SIZE);
 			context.arc(x1 * UNIT_SIZE, y1 * UNIT_SIZE, 0.125 * UNIT_SIZE, 0, 2 * Math.PI);
-			stroke(true);
+			context.strokeStyle = COLORS.BLACK;
+			context.fillStyle = COLORS.BLACK;
+			if(hint) {
+				context.strokeStyle = COLORS.DARK_GRAY;
+				context.fillStyle = COLORS.DARK_GRAY;
+			}
+			context.stroke();
+			context.fill();
 			context.beginPath();
 			context.moveTo(x1 * UNIT_SIZE, y1 * UNIT_SIZE);
 			context.lineTo(x2 * UNIT_SIZE, y2 * UNIT_SIZE);
-			stroke(true);
+			context.stroke();
+			context.fill();
 			context.beginPath();
 			context.arc(x2 * UNIT_SIZE, y2 * UNIT_SIZE, 0.125 * UNIT_SIZE, 0, 2 * Math.PI);
 			context.lineTo(x2 * UNIT_SIZE, y2 * UNIT_SIZE);
-			stroke(true);
+			context.stroke();
+			context.fill();
 		}
 	}
 
@@ -192,10 +220,11 @@ export function CircuitMapPage() {
 			<br />
 
 			<div>
-				<button onClick={() => toolInHand = ("AND")}>AND</button>
-				<button onClick={() => toolInHand = ("OR")}>OR</button>
-				<button onClick={() => toolInHand = ("NOT")}>NOT</button>
-				<button onClick={() => toolInHand = ("wire")}>Wire</button>
+				<button onClick={() => toolInHand = "AND"}>AND</button>
+				<button onClick={() => toolInHand = "OR"}>OR</button>
+				<button onClick={() => toolInHand = "NOT"}>NOT</button>
+				<button onClick={() => toolInHand = "wire"}>Wire</button>
+				<button onClick={() => toolInHand = "light"}>Light</button>
 			</div>
 			<br />
 
