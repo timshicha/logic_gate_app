@@ -17,6 +17,7 @@ export function CircuitMapPage() {
 	// Where the user's last coordinates were
 	let clientX = 0;
 	let clientY = 0;
+	let toolInHand = "wire";
 
 	useEffect(() => {
 		// Add a listener to detect canvas clicks
@@ -50,26 +51,24 @@ export function CircuitMapPage() {
 		console.log(x, y);
 
 		// If placement is not wire, then place where the user clicks
-		const item = document.getElementById("item").value;
-		if(item !== "wire") {
+		if(toolInHand !== "wire") {
 			// Clear hint canvas
 			hintCanvasRef.current.getContext("2d").clearRect(0, 0, mainCanvasRef.current.width, mainCanvasRef.current.height);
-			draw(mainCanvasRef.current, item, x,y, null, null, COLORS.BLACK);
+			draw(mainCanvasRef.current, toolInHand, x,y, null, null, COLORS.BLACK);
 		}
 	}
 
 	// When the user moves in the canvas, see if they hovered over a new grid intersection.
 	// If so, update the canvas.
 	function handleCanvasMove(event) {
-		const item = document.getElementById("item").value;
+		console.log("tool", toolInHand);
 		const rect = hintCanvasRef.current.getBoundingClientRect();
 		const coordX = event.clientX - rect.left;
 		const coordY = event.clientY - rect.top;
 		let [x, y] = readCanvasClick(coordX, coordY);
 		if(x !== clientX || y !== clientY) {
-			console.log("move");
 			hintCanvasRef.current.getContext("2d").clearRect(0, 0, mainCanvasRef.current.width, mainCanvasRef.current.height);
-			draw(hintCanvasRef.current, item, x, y, null, null, COLORS.DARK_GRAY);
+			draw(hintCanvasRef.current, toolInHand, x, y, null, null, COLORS.DARK_GRAY);
 			clientX = x;
 			clientY = y;
 		}
@@ -78,6 +77,7 @@ export function CircuitMapPage() {
 	// Draw the grid lines on the canvas
 	function drawCanvasGridLines(color) {
 		const context = gridCanvasRef.current.getContext("2d");
+		context.clearRect(0, 0, gridCanvasRef.current.width, gridCanvasRef.current.height);
 		context.beginPath();
 		// Draw horizontal lines
 		for (let i = 0; i <= CANVAS_UNITS; i++) {
@@ -98,6 +98,7 @@ export function CircuitMapPage() {
 	// If wire, x2 and y2 must also be specified.
 	function draw(canvas, obj, x1, y1, x2, y2, color) {
 
+		console.log("Drawing", obj);
 		const context = canvas.getContext("2d");
 		function strokeAndFill () {
 			context.strokeStyle = color;
@@ -144,17 +145,6 @@ export function CircuitMapPage() {
 		}
 	}
 
-	function place() {
-		const x1 = parseInt(document.getElementById("x1").value);
-		const x2 = parseInt(document.getElementById("x2").value);
-		const y1 = parseInt(document.getElementById("y1").value);
-		const y2 = parseInt(document.getElementById("y2").value);
-		const item = document.getElementById("item").value;
-
-		draw(mainCanvasRef.current, item, x1, y1, x2, y2, COLORS.BLACK);
-
-		console.log(x1, x2, y1, y2, item);
-	}
 
 	return (
 		<>
@@ -162,22 +152,14 @@ export function CircuitMapPage() {
 			<br />
 			<button onClick={() => drawCanvasGridLines(COLORS.GRAY)}>Set up</button>
 			<br />
-			x1: <input type="number" id="x1"/>
+
+			<div>
+				<button onClick={() => toolInHand = ("AND")}>AND</button>
+				<button onClick={() => toolInHand = ("OR")}>OR</button>
+				<button onClick={() => toolInHand = ("NOT")}>NOT</button>
+				<button onClick={() => toolInHand = ("wire")}>Wire</button>
+			</div>
 			<br />
-			y1: <input type="number" id="y1"/>
-			<br />
-			x1: <input type="number" id="x2"/>
-			<br />
-			y1: <input type="number" id="y2"/>
-			<br />
-			item: <select name="item" id="item">
-				<option value="AND" >AND</option>
-				<option value="OR" >OR</option>
-				<option value="NOT" >NOT</option>
-				<option value="wire" >wire</option>
-			</select>
-			<br />
-			<button className="bg-gray-600" onClick={place}>Place</button>
 
 			<div className="relative">
 				<canvas ref={gridCanvasRef} className="bg-red-600 absolute pointer-events-none" width={CANVAS_UNITS * UNIT_SIZE} height={CANVAS_UNITS * UNIT_SIZE}></canvas>
