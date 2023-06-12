@@ -50,6 +50,8 @@ export function CircuitMapPage() {
 		// If placement is not wire, then place where the user clicks
 		const item = document.getElementById("item").value;
 		if(item !== "wire") {
+			// Clear hint canvas
+			hintCanvasRef.current.getContext("2d").clearRect(0, 0, mainCanvasRef.current.width, mainCanvasRef.current.height);
 			draw(mainCanvasRef.current, item, x,y, null, null, COLORS.BLACK);
 		}
 	}
@@ -64,7 +66,7 @@ export function CircuitMapPage() {
 		let [x, y] = readCanvasClick(coordX, coordY);
 		if(x !== clientX || y !== clientY) {
 			hintCanvasRef.current.getContext("2d").clearRect(0, 0, mainCanvasRef.current.width, mainCanvasRef.current.height);
-			draw(hintCanvasRef.current, item, x, y, null, null, COLORS.BLACK);
+			draw(hintCanvasRef.current, item, x, y, null, null, COLORS.DARK_GRAY);
 			setClientX(x);
 			setClientY(y);
 		}
@@ -160,8 +162,8 @@ export function CircuitMapPage() {
 			<button className="bg-gray-600" onClick={place}>Place</button>
 
 			<div className="relative">
-				<canvas ref={gridCanvasRef} className="absolute pointer-events-none" width={CANVAS_UNITS * UNIT_SIZE} height={CANVAS_UNITS * UNIT_SIZE}></canvas>
-				<canvas ref={mainCanvasRef} className="bg-red-600 absolute" width={CANVAS_UNITS * UNIT_SIZE} height={CANVAS_UNITS * UNIT_SIZE}></canvas>
+				<canvas ref={gridCanvasRef} className="bg-red-600 absolute pointer-events-none" width={CANVAS_UNITS * UNIT_SIZE} height={CANVAS_UNITS * UNIT_SIZE}></canvas>
+				<canvas ref={mainCanvasRef} className="absolute" width={CANVAS_UNITS * UNIT_SIZE} height={CANVAS_UNITS * UNIT_SIZE}></canvas>
 				<canvas ref={hintCanvasRef} className="absolute pointer-events-none" width={CANVAS_UNITS * UNIT_SIZE} height={CANVAS_UNITS * UNIT_SIZE}></canvas>
 			</div>
 		</>
