@@ -133,12 +133,14 @@ export function CircuitMapPage() {
 	// If wire, x2 and y2 must also be specified.
 	function draw(canvas, obj, x1, y1, x2, y2, color) {
 		const context = canvas.getContext("2d");
-		function strokeAndFill () {
+		function stroke (fill = false) {
 			context.strokeStyle = color;
 			context.fillStyle = color;
-			context.lineWidth = 1;
+			context.lineWidth = 2;
 			context.stroke();
-			context.fill();
+			if(fill) {
+				context.fill();
+			}
 		}
 
 		context.beginPath();
@@ -147,36 +149,36 @@ export function CircuitMapPage() {
 			context.lineTo((x1 - 1) * UNIT_SIZE, (y1 + 1) * UNIT_SIZE);
 			context.arc(x1 * UNIT_SIZE, y1 * UNIT_SIZE, UNIT_SIZE, Math.PI / 2, 3 * Math.PI / 2, true);
 			context.lineTo((x1 - 1) * UNIT_SIZE, (y1 - 1) * UNIT_SIZE);
-			strokeAndFill();
+			stroke();
 		}
 		else if(obj === "OR") {
 			context.arc((x1 - 2) * UNIT_SIZE, y1 * UNIT_SIZE, 1.5 * UNIT_SIZE, 7 * Math.PI / 4 + 0.05, Math.PI / 4 - 0.05, false);
 			context.arc(x1 * UNIT_SIZE, y1 * UNIT_SIZE, UNIT_SIZE, Math.PI / 2, 3 * Math.PI / 2, true);
 			context.lineTo((x1 - 1) * UNIT_SIZE, (y1 - 1) * UNIT_SIZE);
-			strokeAndFill();
+			stroke();
 		}
 		else if(obj === "NOT") {
 			context.moveTo((x1 + 1/3) * UNIT_SIZE, y1 * UNIT_SIZE);
 			context.lineTo((x1 - 1) * UNIT_SIZE, (y1 - 1) * UNIT_SIZE);
 			context.lineTo((x1 - 1) * UNIT_SIZE, (y1 + 1) * UNIT_SIZE);
 			context.closePath();
-			strokeAndFill();
+			stroke();
 			// context.lineTo((x1 + 1/3) * UNIT_SIZE, y1 * UNIT_SIZE);
 			context.arc((x1 + 2/3) * UNIT_SIZE, y1 * UNIT_SIZE, 1/3 * UNIT_SIZE, Math.PI, 4 * Math.PI, false);
-			strokeAndFill();
+			stroke();
 		}
 		else if(obj === "wire") {
 			context.moveTo(x1 * UNIT_SIZE, y1 * UNIT_SIZE);
 			context.arc(x1 * UNIT_SIZE, y1 * UNIT_SIZE, 0.125 * UNIT_SIZE, 0, 2 * Math.PI);
-			strokeAndFill();
+			stroke(true);
 			context.beginPath();
 			context.moveTo(x1 * UNIT_SIZE, y1 * UNIT_SIZE);
 			context.lineTo(x2 * UNIT_SIZE, y2 * UNIT_SIZE);
-			strokeAndFill();
+			stroke(true);
 			context.beginPath();
 			context.arc(x2 * UNIT_SIZE, y2 * UNIT_SIZE, 0.125 * UNIT_SIZE, 0, 2 * Math.PI);
 			context.lineTo(x2 * UNIT_SIZE, y2 * UNIT_SIZE);
-			strokeAndFill();
+			stroke(true);
 		}
 	}
 
