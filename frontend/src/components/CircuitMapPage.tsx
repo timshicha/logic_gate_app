@@ -141,6 +141,10 @@ export function CircuitMapPage() {
 			context.lineTo((x1 - 1) * UNIT_SIZE, (y1 + 1) * UNIT_SIZE);
 			context.arc(x1 * UNIT_SIZE, y1 * UNIT_SIZE, UNIT_SIZE, Math.PI / 2, 3 * Math.PI / 2, true);
 			context.lineTo((x1 - 1) * UNIT_SIZE, (y1 - 1) * UNIT_SIZE);
+			if(power) {
+				context.fillStyle = COLORS.YELLOW;
+				context.fill();
+			}
 			context.strokeStyle = COLORS.BLACK;
 			if(hint) {
 				context.strokeStyle = COLORS.DARK_GRAY;
@@ -151,6 +155,10 @@ export function CircuitMapPage() {
 			context.arc((x1 - 2) * UNIT_SIZE, y1 * UNIT_SIZE, 1.5 * UNIT_SIZE, 7 * Math.PI / 4 + 0.05, Math.PI / 4 - 0.05, false);
 			context.arc(x1 * UNIT_SIZE, y1 * UNIT_SIZE, UNIT_SIZE, Math.PI / 2, 3 * Math.PI / 2, true);
 			context.lineTo((x1 - 1) * UNIT_SIZE, (y1 - 1) * UNIT_SIZE);
+			if(power) {
+				context.fillStyle = COLORS.YELLOW;
+				context.fill();
+			}
 			context.strokeStyle = COLORS.BLACK;
 			if(hint) {
 				context.strokeStyle = COLORS.DARK_GRAY;
@@ -162,12 +170,21 @@ export function CircuitMapPage() {
 			context.lineTo((x1 - 1) * UNIT_SIZE, (y1 - 1) * UNIT_SIZE);
 			context.lineTo((x1 - 1) * UNIT_SIZE, (y1 + 1) * UNIT_SIZE);
 			context.closePath();
+			context.fillStyle = COLORS.YELLOW;
+			if(power && !hint) {
+				context.fill();
+			}
+			context.strokeStyle = COLORS.BLACK;
 			if(hint) {
 				context.strokeStyle = COLORS.DARK_GRAY;
 			}
-			context.strokeStyle = COLORS.BLACK;
 			context.stroke();
+			context.beginPath();
 			context.arc((x1 + 2/3) * UNIT_SIZE, y1 * UNIT_SIZE, 1/3 * UNIT_SIZE, Math.PI, 4 * Math.PI, false);
+			context.closePath();
+			if(!power && !hint) {
+				context.fill();
+			}
 			context.stroke();
 		}
 		else if(obj === "light") {
