@@ -1,11 +1,10 @@
-import React, {useEffect, useRef, useState} from "react";
+import React, { Component, useEffect, useRef, useState } from "react";
 import { COLORS } from "@/utils/constants.tsx";
 
 let toolInHand = "wire";
 let c = 0;
 
 export function CircuitMapPage() {
-
 
 	// How many "blocks" the canvas should be. The more blocks, the
 	// bigger the grid. This allows the user to place gates and wires
@@ -16,24 +15,25 @@ export function CircuitMapPage() {
 	const mainCanvasRef = useRef(null);
 	const gridCanvasRef = useRef(null);
 	const hintCanvasRef = useRef(null);
-	const [wireStart, setWireStart] = useState(null);
+	const [wireStart, setWireStart] = useState([null, null]);
 	// Where the user's last coordinates were
-	let clientX = 0;
-	let clientY = 0;
+	const [clientPos, setClientPost] = useState([0, 0]);
+
 
 	useEffect(() => {
 		// Add a listener to detect canvas clicks
-		mainCanvasRef.current.addEventListener("mousedown", event => handleCanvasClick(event));
+		mainCanvasRef.current.addEventListener("mousedown", handleCanvasClick);
 		mainCanvasRef.current.addEventListener("mousemove", event => handleCanvasMove(event));
-
 		return () => {
-			mainCanvasRef.current.removeEventListener("mousedown", event => handleCanvasClick(event));
+			mainCanvasRef.current.removeEventListener("mousedown", handleCanvasClick);
 			mainCanvasRef.current.removeEventListener("mousemove", event => handleCanvasMove(event));
 		}
-	});
+	}, []);
 
 	function clearCanvas(canvas) {
-		canvas.getContext("2d").clearRect(0, 0, gridCanvasRef.current.width, gridCanvasRef.current.height);
+		const context = canvas.getContext("2d");
+		context.clearRect(0, 0, gridCanvasRef.current.width, gridCanvasRef.current.height);
+		context.reset();
 	}
 
 	// Given two coordinates on the canvas, find the nearest grid intersection and
@@ -43,39 +43,40 @@ export function CircuitMapPage() {
 		function roundNearest (value, nearest) {
 			return Math.round(value / nearest) * nearest;
 		}
-		return [(roundNearest(x, UNIT_SIZE) / UNIT_SIZE), (roundNearest(y, UNIT_SIZE) / UNIT_SIZE)];
+		let coords = [(roundNearest(x, UNIT_SIZE) / UNIT_SIZE), (roundNearest(y, UNIT_SIZE) / UNIT_SIZE)];
+		return coords;
 	}
 
-	function handleCanvasClick(event) {
-		// The following code detects canvas clicks.
-		// Reference: https://www.geeksforgeeks.org/how-to-get-the-coordinates-of-a-mouse-click-on-a-canvas-element/
-		const rect = mainCanvasRef.current.getBoundingClientRect();
-		const coordX = event.clientX - rect.left;
-		const coordY = event.clientY - rect.top;
+	function handleCanvasClick() {
 
-		let [x, y] = readCanvasClick(coordX, coordY);
+		console.log("current pos:", clientPos[0], clientPos[1]);
 
 		// If a wire is in hand, special treatment
 		if(toolInHand === "wire") {
 			// If no first point selected, select this as first point
-			if(wireStart === null) {
-				setWireStart([x, y]);
+			if(wireStart[0] === null || wireStart[1] === null) {
+				wireStart[0] = clientPos[0];
+				wireStart[1] = clientPos[1];
+				console.log("setting wire start:", clientPos[0], clientPos[1]);
 			}
 			// If selected the same point, cancel wire placement
-			else if (wireStart[0] === x && wireStart[1] === y) {
-				setWireStart(null);
+			else if (wireStart[0] === clientPos[0] && wireStart[1] === clientPos[1]) {
+				wireStart[0] = null;
+				wireStart[1] = null;
 				hintCanvasRef.current.getContext("2d").clearRect(0, 0, mainCanvasRef.current.width, mainCanvasRef.current.height);
 			}
 			// Otherwise, place the wire
 			else {
-				draw(mainCanvasRef.current, toolInHand, wireStart[0], wireStart[1], x, y, COLORS.BLACK);
-				setWireStart(null);
+
+				draw(mainCanvasRef.current, toolInHand, wireStart[0], wireStart[1], clientPos[0], clientPos[1], COLORS.BLACK);
+				wireStart[0] = null;
+				wireStart[1] = null;
 				hintCanvasRef.current.getContext("2d").clearRect(0, 0, mainCanvasRef.current.width, mainCanvasRef.current.height);
 			}
 		}
 		else {
 			// Clear hint canvas
-			draw(mainCanvasRef.current, toolInHand, x,y, null, null, COLORS.BLACK);
+			draw(mainCanvasRef.current, toolInHand, clientPos[0],clientPos[1], null, null, COLORS.BLACK);
 			hintCanvasRef.current.getContext("2d").clearRect(0, 0, mainCanvasRef.current.width, mainCanvasRef.current.height);
 		}
 	}
@@ -87,19 +88,19 @@ export function CircuitMapPage() {
 		const coordX = event.clientX - rect.left;
 		const coordY = event.clientY - rect.top;
 		let [x, y] = readCanvasClick(coordX, coordY);
-		if(x !== clientX || y !== clientY) {
-			clientX = x;
-			clientY = y;
-			console.log("new x and y:", x, y);
+		if(x !== clientPos[0] || y !== clientPos[y]) {
+			clientPos[0] = x;
+			clientPos[1] = y;
+			console.log("coords:", clientPos[0], clientPos[1]);
 			hintCanvasRef.current.getContext("2d").clearRect(0, 0, mainCanvasRef.current.width, mainCanvasRef.current.height);
 			// Wires get special treatment
 			if(toolInHand === "wire") {
-				if(wireStart) {
-					draw(hintCanvasRef.current, toolInHand, wireStart[0], wireStart[1], x, y, COLORS.DARK_GRAY);
+				if(wireStart[0] !== null && wireStart[1] !== null) {
+					draw(hintCanvasRef.current, toolInHand, wireStart[0], wireStart[1], clientPos[0], clientPos[1], COLORS.DARK_GRAY);
 				}
 			}
 			else {
-				draw(hintCanvasRef.current, toolInHand, x, y, null, null, COLORS.DARK_GRAY);
+				draw(hintCanvasRef.current, toolInHand, clientPos[0], clientPos[1], null, null, COLORS.DARK_GRAY);
 			}
 		}
 	}
@@ -134,7 +135,6 @@ export function CircuitMapPage() {
 			context.lineWidth = 1;
 			context.stroke();
 			context.fill();
-			context.closePath();
 		}
 
 		context.beginPath();
@@ -170,10 +170,8 @@ export function CircuitMapPage() {
 			context.beginPath();
 			context.arc(x2 * UNIT_SIZE, y2 * UNIT_SIZE, 0.125 * UNIT_SIZE, 0, 2 * Math.PI);
 			context.lineTo(x2 * UNIT_SIZE, y2 * UNIT_SIZE);
-			console.log(c++);
 			strokeAndFill();
 		}
-		context.closePath();
 	}
 
 
