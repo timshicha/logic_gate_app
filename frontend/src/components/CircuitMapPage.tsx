@@ -1,6 +1,7 @@
 import React, {useEffect, useRef, useState} from "react";
 import { COLORS } from "@/utils/constants.tsx";
 
+
 export function CircuitMapPage() {
 
 
@@ -13,8 +14,9 @@ export function CircuitMapPage() {
 	const mainCanvasRef = useRef(null);
 	const gridCanvasRef = useRef(null);
 	const hintCanvasRef = useRef(null);
-	const [clientX, setClientX] = useState(0);
-	const [clientY, setClientY] = useState(0);
+	// Where the user's last coordinates were
+	let clientX = 0;
+	let clientY = 0;
 
 	useEffect(() => {
 		// Add a listener to detect canvas clicks
@@ -65,10 +67,11 @@ export function CircuitMapPage() {
 		const coordY = event.clientY - rect.top;
 		let [x, y] = readCanvasClick(coordX, coordY);
 		if(x !== clientX || y !== clientY) {
+			console.log("move");
 			hintCanvasRef.current.getContext("2d").clearRect(0, 0, mainCanvasRef.current.width, mainCanvasRef.current.height);
 			draw(hintCanvasRef.current, item, x, y, null, null, COLORS.DARK_GRAY);
-			setClientX(x);
-			setClientY(y);
+			clientX = x;
+			clientY = y;
 		}
 	}
 
@@ -94,18 +97,29 @@ export function CircuitMapPage() {
 	// Draw the specified shape.
 	// If wire, x2 and y2 must also be specified.
 	function draw(canvas, obj, x1, y1, x2, y2, color) {
+
 		const context = canvas.getContext("2d");
+		function strokeAndFill () {
+			context.strokeStyle = color;
+			context.fillStyle = color;
+			context.lineWidth = 1;
+			context.stroke();
+			context.fill();
+		}
+
 		context.beginPath();
 		if(obj === "AND") {
 			context.moveTo((x1 - 1) * UNIT_SIZE, (y1 - 1) * UNIT_SIZE);
 			context.lineTo((x1 - 1) * UNIT_SIZE, (y1 + 1) * UNIT_SIZE);
 			context.arc(x1 * UNIT_SIZE, y1 * UNIT_SIZE, UNIT_SIZE, Math.PI / 2, 3 * Math.PI / 2, true);
 			context.lineTo((x1 - 1) * UNIT_SIZE, (y1 - 1) * UNIT_SIZE);
+			strokeAndFill();
 		}
 		else if(obj === "OR") {
 			context.arc((x1 - 2) * UNIT_SIZE, y1 * UNIT_SIZE, 1.5 * UNIT_SIZE, 7 * Math.PI / 4 + 0.05, Math.PI / 4 - 0.05, false);
 			context.arc(x1 * UNIT_SIZE, y1 * UNIT_SIZE, UNIT_SIZE, Math.PI / 2, 3 * Math.PI / 2, true);
 			context.lineTo((x1 - 1) * UNIT_SIZE, (y1 - 1) * UNIT_SIZE);
+			strokeAndFill();
 		}
 		else if(obj === "NOT") {
 			context.moveTo((x1 + 0.5) * UNIT_SIZE, y1 * UNIT_SIZE);
@@ -113,17 +127,21 @@ export function CircuitMapPage() {
 			context.lineTo((x1 - 1) * UNIT_SIZE, (y1 + 1) * UNIT_SIZE);
 			context.lineTo((x1 + 0.5) * UNIT_SIZE, y1 * UNIT_SIZE);
 			context.arc((x1 + 0.75) * UNIT_SIZE, y1 * UNIT_SIZE, 0.25 * UNIT_SIZE, Math.PI, 3 * Math.PI, false);
-
+			strokeAndFill();
 		}
 		else if(obj === "wire") {
 			context.moveTo(x1 * UNIT_SIZE, y1 * UNIT_SIZE);
+			context.arc(x1 * UNIT_SIZE, y1 * UNIT_SIZE, UNIT_SIZE / 4, 0, 2 * Math.PI);
+			strokeAndFill();
+			context.beginPath();
+			context.moveTo(x1 * UNIT_SIZE, y1 * UNIT_SIZE);
 			context.lineTo(x2 * UNIT_SIZE, y2 * UNIT_SIZE);
+			strokeAndFill();
+			context.beginPath();
+			context.arc(x2 * UNIT_SIZE, y2 * UNIT_SIZE, UNIT_SIZE / 4, 0, 2 * Math.PI);
+			context.lineTo(x2 * UNIT_SIZE, y2 * UNIT_SIZE);
+			strokeAndFill();
 		}
-		context.strokeStyle = color;
-		context.fillStyle = color;
-		context.lineWidth = 1;
-		context.stroke();
-		context.fill();
 	}
 
 	function place() {
