@@ -40,6 +40,7 @@ export function CircuitMapPage() {
 		else {
 			switches[switchNumber] = 0;
 		}
+		refreshCanvas();
 	}
 
 	function clearCanvas(canvas) {
@@ -115,7 +116,8 @@ export function CircuitMapPage() {
 			circuitBoard.addObject(toolInHand, clientPos[1], clientPos[0]);
 			draw(mainCanvasRef.current, toolInHand, clientPos[0],clientPos[1], null, null, 0, false);
 		}
-		drawCanvas();
+		circuitBoard.propogatePower();
+		refreshCanvas();
 	}
 
 	// When the user moves in the canvas, see if they hovered over a new grid intersection.
@@ -174,21 +176,34 @@ export function CircuitMapPage() {
 		context.stroke();
 	}
 
-	function drawCanvas() {
+	function refreshCanvas() {
 		const canvas = mainCanvasRef.current;
 		clearCanvas(canvas);
 
+		// DRAW WIRES FIRST SO THEY DON'T COVER GATES
 		// For each row
 		for (let i = 0; i < circuitBoard.objects.length; i++) {
 			// For each cell
 			for (let j = 0; j < circuitBoard.objects[0].length; j++) {
 				// For each object
 				for (let object of circuitBoard.objects[i][j]) {
-					console.log("here");
 					if(object[0] === "wire") {
 						draw(mainCanvasRef.current, "wire", j, i, object[2], object[1], object[3]);
 					}
 					else {
+						draw(mainCanvasRef.current, object[0], j, i, null, null, object[3]);
+					}
+				}
+			}
+		}
+		// DRAW GATES
+		// For each row
+		for (let i = 0; i < circuitBoard.objects.length; i++) {
+			// For each cell
+			for (let j = 0; j < circuitBoard.objects[0].length; j++) {
+				// For each object
+				for (let object of circuitBoard.objects[i][j]) {
+					if(object[0] !== "wire") {
 						draw(mainCanvasRef.current, object[0], j, i, null, null, object[3]);
 					}
 				}
@@ -351,7 +366,7 @@ export function CircuitMapPage() {
 
 			<button onClick={() => {console.log(circuitBoard.objects)}}>List objects</button>
 			<button onClick={() => {circuitBoard.propogatePower()}}>Propogate</button>
-			<button onClick={drawCanvas}>Draw canvas</button>
+			<button onClick={refreshCanvas}>Draw canvas</button>
 
 			<div className="relative">
 				<canvas ref={gridCanvasRef} className="bg-red-600 absolute pointer-events-none" width={CANVAS_UNITS * UNIT_SIZE} height={CANVAS_UNITS * UNIT_SIZE}></canvas>

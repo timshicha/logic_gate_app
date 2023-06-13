@@ -133,7 +133,6 @@ export class CircuitBoard {
             if(++iterations >= 1000) {
                 return false;
             }
-            console.log(iterations);
         }
         return true;
     }
