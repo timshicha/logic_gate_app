@@ -115,6 +115,7 @@ export function CircuitMapPage() {
 			circuitBoard.addObject(toolInHand, clientPos[1], clientPos[0]);
 			draw(mainCanvasRef.current, toolInHand, clientPos[0],clientPos[1], null, null, 0, false);
 		}
+		drawCanvas();
 	}
 
 	// When the user moves in the canvas, see if they hovered over a new grid intersection.
@@ -197,7 +198,7 @@ export function CircuitMapPage() {
 
 	function drawSwitch(canvas, x, y, text, power= 0) {
 		const context = canvas.getContext("2d");
-		context.lineWidth = 2;
+		context.lineWidth = 4;
 
 		context.strokeStyle = COLORS.BLACK;
 		context.moveTo((x + 1) * UNIT_SIZE, y * UNIT_SIZE);
@@ -224,7 +225,7 @@ export function CircuitMapPage() {
 	// If wire, x2 and y2 must also be specified.
 	function draw(canvas, obj, x1, y1, x2, y2, power=0, hint=false) {
 		const context = canvas.getContext("2d");
-		context.lineWidth = 2;
+		context.lineWidth = 4;
 
 		context.beginPath();
 		if(obj === "AND") {
@@ -293,12 +294,13 @@ export function CircuitMapPage() {
 			context.lineTo((x1 + 1) * UNIT_SIZE, (y1 + 0.5) * UNIT_SIZE);
 			context.closePath();
 			if(power) {
-				context.fillStyle = COLORS.YELLOW;
+				context.fillStyle = COLORS.LIGHT_YELLOW;
 				context.fill();
 			}
 			context.stroke();
 		}
 		else if(obj === "wire") {
+			context.lineWidth = 2;
 			context.moveTo(x1 * UNIT_SIZE, y1 * UNIT_SIZE);
 			context.arc(x1 * UNIT_SIZE, y1 * UNIT_SIZE, 0.125 * UNIT_SIZE, 0, 2 * Math.PI);
 			context.strokeStyle = COLORS.BLACK;
