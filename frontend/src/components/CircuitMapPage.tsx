@@ -18,7 +18,7 @@ export function CircuitMapPage() {
 	const [wireStart, setWireStart] = useState([null, null]);
 	// Where the user's last coordinates were
 	const [clientPos, setClientPost] = useState([0, 0]);
-
+	const [switches] = useState([0, 0, 0, 0]);
 
 	useEffect(() => {
 		// Add a listener to detect canvas clicks
@@ -34,6 +34,15 @@ export function CircuitMapPage() {
 		const context = canvas.getContext("2d");
 		context.clearRect(0, 0, gridCanvasRef.current.width, gridCanvasRef.current.height);
 		context.reset();
+		drawCanvasGridLines(mainCanvasRef.current);
+		drawSwitches(mainCanvasRef.current);
+	}
+
+	function drawSwitches(canvas) {
+		draw_switch(mainCanvasRef.current, 2, 5, "A", switches[0]);
+		draw_switch(mainCanvasRef.current, 2, 15, "B", switches[1]);
+		draw_switch(mainCanvasRef.current, 2, 25, "C", switches[2]);
+		draw_switch(mainCanvasRef.current, 2, 35, "D", switches[3]);
 	}
 
 	// Given two coordinates on the canvas, find the nearest grid intersection and
@@ -49,15 +58,12 @@ export function CircuitMapPage() {
 
 	function handleCanvasClick() {
 
-		console.log("current pos:", clientPos[0], clientPos[1]);
-
 		// If a wire is in hand, special treatment
 		if(toolInHand === "wire") {
 			// If no first point selected, select this as first point
 			if(wireStart[0] === null || wireStart[1] === null) {
 				wireStart[0] = clientPos[0];
 				wireStart[1] = clientPos[1];
-				console.log("setting wire start:", clientPos[0], clientPos[1]);
 			}
 			// If selected the same point, cancel wire placement
 			else if (wireStart[0] === clientPos[0] && wireStart[1] === clientPos[1]) {
@@ -91,7 +97,6 @@ export function CircuitMapPage() {
 		if(x !== clientPos[0] || y !== clientPos[y]) {
 			clientPos[0] = x;
 			clientPos[1] = y;
-			console.log("coords:", clientPos[0], clientPos[1]);
 			hintCanvasRef.current.getContext("2d").clearRect(0, 0, mainCanvasRef.current.width, mainCanvasRef.current.height);
 			// Wires get special treatment
 			if(toolInHand === "wire") {
@@ -127,6 +132,29 @@ export function CircuitMapPage() {
 		context.strokeStyle = color;
 		context.lineWidth = 0.1;
 		context.stroke();
+	}
+
+	function draw_switch(canvas, x, y, text, power= 0) {
+		const context = canvas.getContext("2d");
+		context.lineWidth = 2;
+
+		context.strokeStyle = COLORS.BLACK;
+		context.moveTo((x + 1) * UNIT_SIZE, y * UNIT_SIZE);
+		context.lineTo((x + 0.5) * UNIT_SIZE, y * UNIT_SIZE);
+		context.stroke();
+		context.beginPath();
+		context.lineTo((x + 0.5) * UNIT_SIZE, (y - 1) * UNIT_SIZE);
+		context.lineTo((x - 1) * UNIT_SIZE, (y - 1) * UNIT_SIZE);
+		context.lineTo((x - 1) * UNIT_SIZE, (y + 1) * UNIT_SIZE);
+		context.lineTo((x + 0.5) * UNIT_SIZE, (y + 1) * UNIT_SIZE);
+		context.closePath();
+		if(power) {
+			context.fillStyle = COLORS.YELLOW;
+		}
+		context.stroke();
+		context.font = "20px Arial";
+		context.textAlign = "center";
+		context.fillText(text, (x - 1/3) * UNIT_SIZE, (y + 0.5) * UNIT_SIZE);
 	}
 
 	// Draw the specified shape.
@@ -182,7 +210,7 @@ export function CircuitMapPage() {
 			context.beginPath();
 			context.arc((x1 + 2/3) * UNIT_SIZE, y1 * UNIT_SIZE, 1/3 * UNIT_SIZE, Math.PI, 4 * Math.PI, false);
 			context.closePath();
-			if(!power && !hint) {
+			if(power && !hint) {
 				context.fill();
 			}
 			context.stroke();
