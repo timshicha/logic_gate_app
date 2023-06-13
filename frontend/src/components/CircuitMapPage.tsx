@@ -20,7 +20,6 @@ export function CircuitMapPage() {
 	const [wireStart, setWireStart] = useState([null, null]);
 	// Where the user's last coordinates were
 	const [clientPos, setClientPost] = useState([0, 0]);
-	const [switches] = useState([0, 0, 0, 0]);
 	const [circuitBoard] = useState(new CircuitBoard(CANVAS_UNITS, CANVAS_UNITS));
 
 	useEffect(() => {
@@ -33,34 +32,37 @@ export function CircuitMapPage() {
 		}
 	}, []);
 
-	function toggleSwitch(switchNumber) {
-		if(switches[switchNumber] === 0) {
-			switches[switchNumber] = 1;
+	// Remove all gates and wires from canvas
+	function resetCanvas(canvas) {
+		// Draw the grid lines on the grid canvas
+		function drawCanvasGridLines(color) {
+			const context = gridCanvasRef.current.getContext("2d");
+			context.clearRect(0, 0, gridCanvasRef.current.width, gridCanvasRef.current.height);
+			context.beginPath();
+			// Draw horizontal lines
+			for (let i = 0; i <= CANVAS_UNITS; i++) {
+				context.moveTo(0, i * UNIT_SIZE);
+				context.lineTo(CANVAS_UNITS * UNIT_SIZE, i * UNIT_SIZE);
+			}
+			// Draw vertical lines
+			for (let i = 0; i <= CANVAS_UNITS; i++) {
+				context.moveTo(i * UNIT_SIZE, 0);
+				context.lineTo(i * UNIT_SIZE, CANVAS_UNITS * UNIT_SIZE);
+			}
+			context.strokeStyle = color;
+			context.lineWidth = 0.1;
+			context.stroke();
 		}
-		else {
-			switches[switchNumber] = 0;
-		}
-		refreshCanvas();
-	}
 
-	function clearCanvas(canvas) {
 		const context = canvas.getContext("2d");
-		context.clearRect(0, 0, gridCanvasRef.current.width, gridCanvasRef.current.height);
+		// context.clearRect(0, 0, gridCanvasRef.current.width, gridCanvasRef.current.height);
 		context.reset();
-		drawCanvasGridLines(mainCanvasRef.current);
-		drawSwitches(mainCanvasRef.current);
-		drawLight(canvas, 0);
-	}
-
-	function drawLight(canvas, power) {
-		draw(canvas, "light", lightPosition[0], lightPosition[1], null, null,power=0);
-	}
-
-	function drawSwitches(canvas) {
-		drawSwitch(mainCanvasRef.current, switchPositions[0][0], switchPositions[0][1], "A", switches[0]);
-		drawSwitch(mainCanvasRef.current, switchPositions[1][0], switchPositions[1][1], "B", switches[1]);
-		drawSwitch(mainCanvasRef.current, switchPositions[2][0], switchPositions[2][1], "C", switches[2]);
-		drawSwitch(mainCanvasRef.current, switchPositions[3][0], switchPositions[3][1], "D", switches[3]);
+		// Add switches to board
+		for (let currentSwitch of switchPositions) {
+			circuitBoard.addSwitch(currentSwitch[0], currentSwitch[1]);
+		}
+		// Add light to board
+		circuitBoard.addObject("light", lightPosition[0], lightPosition[1]);
 	}
 
 	// Given two coordinates on the canvas, find the nearest grid intersection and
@@ -78,11 +80,9 @@ export function CircuitMapPage() {
 
 		// See if they clicked on a switch. If they did, toggle the switch.
 		// Go through each switch position
-		for (let i = 0; i < switchPositions.length; i++) {
-			if(clientPos[0] === switchPositions[i][0] && clientPos[1] === switchPositions[i][1]) {
-				toggleSwitch(i);
-				console.log("toggled");
-				return;
+		for (let currentSwitch of switchPositions) {
+			if(currentSwitch[0] === clientPos[0] && currentSwitch[1] === clientPos[1]) {
+				circuitBoard.toggleSwitch(currentSwitch[0], currentSwitch[1]);
 			}
 		}
 
@@ -156,29 +156,12 @@ export function CircuitMapPage() {
 		}
 	}
 
-	// Draw the grid lines on the canvas
-	function drawCanvasGridLines(color) {
-		const context = gridCanvasRef.current.getContext("2d");
-		context.clearRect(0, 0, gridCanvasRef.current.width, gridCanvasRef.current.height);
-		context.beginPath();
-		// Draw horizontal lines
-		for (let i = 0; i <= CANVAS_UNITS; i++) {
-			context.moveTo(0, i * UNIT_SIZE);
-			context.lineTo(CANVAS_UNITS * UNIT_SIZE, i * UNIT_SIZE);
-		}
-		// Draw vertical lines
-		for (let i = 0; i <= CANVAS_UNITS; i++) {
-			context.moveTo(i * UNIT_SIZE, 0);
-			context.lineTo(i * UNIT_SIZE, CANVAS_UNITS * UNIT_SIZE);
-		}
-		context.strokeStyle = color;
-		context.lineWidth = 0.1;
-		context.stroke();
-	}
-
+	// Draw the circuit in the CircuitBoard object on to the canvas.
+	// Note: the canvas will be reset first.
 	function refreshCanvas() {
 		const canvas = mainCanvasRef.current;
-		clearCanvas(canvas);
+		const context = canvas.getContext("2d");
+		context.reset();
 
 		// DRAW WIRES FIRST SO THEY DON'T COVER GATES
 		// For each row
@@ -209,8 +192,15 @@ export function CircuitMapPage() {
 				}
 			}
 		}
+		// Draw switches
+		const letters = ["A", "B", "C", "D"];
+		for (let i = 0; i < circuitBoard.switches.length; i++) {
+			const currentSwitch = circuitBoard.switches[i];
+			drawSwitch(canvas, currentSwitch[0], currentSwitch[1], letters[i], currentSwitch[2]);
+		}
 	}
 
+	// Draw a switch on the canvas
 	function drawSwitch(canvas, x, y, text, power= 0) {
 		const context = canvas.getContext("2d");
 		context.lineWidth = 4;
@@ -310,8 +300,11 @@ export function CircuitMapPage() {
 			context.closePath();
 			if(power) {
 				context.fillStyle = COLORS.LIGHT_YELLOW;
-				context.fill();
 			}
+			else {
+				context.fillStyle = COLORS.DARK_GRAY;
+			}
+			context.fill();
 			context.stroke();
 		}
 		else if(obj === "wire") {
@@ -346,13 +339,11 @@ export function CircuitMapPage() {
 		}
 	}
 
-
 	return (
 		<>
 			Circuit Map Page
 			<br />
-			<button onClick={() => drawCanvasGridLines(COLORS.GRAY)}>Set up</button>
-			<button onClick={() => {clearCanvas(mainCanvasRef.current)}}>Clear canvas</button>
+			<button onClick={() => {resetCanvas(mainCanvasRef.current)}}>Clear canvas</button>
 			<br />
 
 			<div>

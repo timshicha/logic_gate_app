@@ -18,11 +18,22 @@ export class CircuitBoard {
         this.switches.push([x, y, 0]);
     }
 
-    public toggleSwitch = (switchX, switchhY, switchPower: 0 | 1) => {
+    public toggleSwitch = (switchX, switchhY, switchPower: 0 | 1 | null = null) => {
         // Find the switch
         for (let currentSwitch of this.switches) {
             if(currentSwitch[0] === switchX && currentSwitch[1] === switchhY) {
-                currentSwitch[2] = switchPower;
+                // If switch power not provied, flip the switch
+                if(switchPower === null) {
+                    if(currentSwitch[2] === 0) {
+                        currentSwitch = 1;
+                    }
+                    else {
+                        currentSwitch = 0;
+                    }
+                }
+                else {
+                    currentSwitch[2] = switchPower;
+                }
             }
         }
     }
