@@ -2,7 +2,8 @@ import React, { Component, useEffect, useRef, useState } from "react";
 import { COLORS } from "@/utils/constants.tsx";
 
 let toolInHand = "wire";
-let c = 0;
+
+const switchPositions = [[2, 5], [2, 15], [2, 25], [2, 35]];
 
 export function CircuitMapPage() {
 
@@ -30,6 +31,15 @@ export function CircuitMapPage() {
 		}
 	}, []);
 
+	function toggleSwitch(switchNumber) {
+		if(switches[switchNumber] === 0) {
+			switches[switchNumber] = 1;
+		}
+		else {
+			switches[switchNumber] = 0;
+		}
+	}
+
 	function clearCanvas(canvas) {
 		const context = canvas.getContext("2d");
 		context.clearRect(0, 0, gridCanvasRef.current.width, gridCanvasRef.current.height);
@@ -39,10 +49,10 @@ export function CircuitMapPage() {
 	}
 
 	function drawSwitches(canvas) {
-		draw_switch(mainCanvasRef.current, 2, 5, "A", switches[0]);
-		draw_switch(mainCanvasRef.current, 2, 15, "B", switches[1]);
-		draw_switch(mainCanvasRef.current, 2, 25, "C", switches[2]);
-		draw_switch(mainCanvasRef.current, 2, 35, "D", switches[3]);
+		drawSwitch(mainCanvasRef.current, switchPositions[0][0], switchPositions[0][1], "A", switches[0]);
+		drawSwitch(mainCanvasRef.current, switchPositions[1][0], switchPositions[1][1], "B", switches[1]);
+		drawSwitch(mainCanvasRef.current, switchPositions[2][0], switchPositions[2][1], "C", switches[2]);
+		drawSwitch(mainCanvasRef.current, switchPositions[3][0], switchPositions[3][1], "D", switches[3]);
 	}
 
 	// Given two coordinates on the canvas, find the nearest grid intersection and
@@ -57,6 +67,16 @@ export function CircuitMapPage() {
 	}
 
 	function handleCanvasClick() {
+
+		// See if they clicked on a switch. If they did, toggle the switch.
+		// Go through each switch position
+		for (let i = 0; i < switchPositions.length; i++) {
+			if(clientPos[0] === switchPositions[i][0] && clientPos[1] === switchPositions[i][1]) {
+				toggleSwitch(i);
+				console.log("toggled");
+				return;
+			}
+		}
 
 		// If a wire is in hand, special treatment
 		if(toolInHand === "wire") {
@@ -98,6 +118,15 @@ export function CircuitMapPage() {
 			clientPos[0] = x;
 			clientPos[1] = y;
 			hintCanvasRef.current.getContext("2d").clearRect(0, 0, mainCanvasRef.current.width, mainCanvasRef.current.height);
+
+			// See if they hovered over a switch. If they did, do not show their
+			// tool to make it clear that they are not placing down a gate / wire.
+			for (let i = 0; i < switchPositions.length; i++) {
+				if(clientPos[0] === switchPositions[i][0] && clientPos[1] === switchPositions[i][1]) {
+					return;
+				}
+			}
+
 			// Wires get special treatment
 			if(toolInHand === "wire") {
 				// If we have a wire start
@@ -134,7 +163,7 @@ export function CircuitMapPage() {
 		context.stroke();
 	}
 
-	function draw_switch(canvas, x, y, text, power= 0) {
+	function drawSwitch(canvas, x, y, text, power= 0) {
 		const context = canvas.getContext("2d");
 		context.lineWidth = 2;
 
@@ -150,10 +179,12 @@ export function CircuitMapPage() {
 		context.closePath();
 		if(power) {
 			context.fillStyle = COLORS.YELLOW;
+			context.fill();
 		}
 		context.stroke();
 		context.font = "20px Arial";
 		context.textAlign = "center";
+		context.fillStyle = COLORS.BLACK;
 		context.fillText(text, (x - 1/3) * UNIT_SIZE, (y + 0.5) * UNIT_SIZE);
 	}
 
