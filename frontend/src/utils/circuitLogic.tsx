@@ -115,16 +115,25 @@ export class CircuitBoard {
                         }
                         // If NOT gate
                         else if(object[0] === "NOT") {
-                            // If input and output are not opposite, propogate
-                            if(this.power[i][j - 1] === 1 && this.power[i][j + 1] === 1) {
-                                this.power[i][j + 1] = 0;
+                            // If input is 0, then output should be 1
+                            if(this.power[i][j - 1] === 0) {
+                                // Turn on gate
                                 object[3] = 1;
-                                propogated = true;
+                                // Propogate if need be
+                                if(this.power[i][j + 1] === 0) {
+                                    this.power[i][j + 1] = 1;
+                                    propogated = true;
+                                }
                             }
-                            else if(this.power[i][j - 1] === 0 && this.power[i][j + 1] === 0) {
-                                this.power[i][j + 1] = 1;
+                            // If input is 1, then output should be 0
+                            else if(this.power[i][j - 1] === 1) {
+                                // Turn off gate
                                 object[3] = 0;
-                                propogated = true;
+                                // Propogate if need be
+                                if(this.power[i][j + 1] === 1) {
+                                    this.power[i][j + 1] = 0;
+                                    propogated = true;
+                                }
                             }
                         }
                         // If light

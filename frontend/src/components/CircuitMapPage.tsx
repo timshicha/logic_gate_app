@@ -119,7 +119,6 @@ export function CircuitMapPage() {
 				hintCanvasRef.current.getContext("2d").clearRect(0, 0, mainCanvasRef.current.width, mainCanvasRef.current.height);
 
 				circuitBoard.addObject("wire", wireStart[1], wireStart[0], clientPos[1], clientPos[0]);
-				draw(mainCanvasRef.current, toolInHand, wireStart[0], wireStart[1], clientPos[0], clientPos[1], 0, false);
 				wireStart[0] = null;
 				wireStart[1] = null;
 			}
@@ -128,7 +127,6 @@ export function CircuitMapPage() {
 			// Clear hint canvas
 			hintCanvasRef.current.getContext("2d").clearRect(0, 0, mainCanvasRef.current.width, mainCanvasRef.current.height);
 			circuitBoard.addObject(toolInHand, clientPos[1], clientPos[0]);
-			draw(mainCanvasRef.current, toolInHand, clientPos[0],clientPos[1], null, null, 0, false);
 		}
 		circuitBoard.propogatePower();
 		refreshCanvas();
