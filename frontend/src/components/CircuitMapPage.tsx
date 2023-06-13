@@ -66,14 +66,8 @@ export function CircuitMapPage() {
 
 		drawCanvasGridLines(gridCanvasRef.current);
 		const context = canvas.getContext("2d");
-		// context.clearRect(0, 0, gridCanvasRef.current.width, gridCanvasRef.current.height);
+		context.clearRect(0, 0, gridCanvasRef.current.width, gridCanvasRef.current.height);
 		context.reset();
-		// Add switches to board
-		for (let currentSwitch of switchPositions) {
-			circuitBoard.addSwitch(currentSwitch[1], currentSwitch[0]);
-		}
-		// Add light to board
-		circuitBoard.addObject("light", lightPosition[1], lightPosition[0]);
 	}
 
 	// Given two coordinates on the canvas, find the nearest grid intersection and
