@@ -10,7 +10,7 @@ const CANVAS_UNITS = 40;
 const UNIT_SIZE = 15;
 let toolInHand = "wire";
 const switchPositions = [[2, 5], [2, 15], [2, 25], [2, 35]];
-const lightPosition = [CANVAS_UNITS - 2, 20];
+const lightPosition = [20, CANVAS_UNITS - 2];
 
 export function CircuitMapPage() {
 
@@ -32,12 +32,22 @@ export function CircuitMapPage() {
 		}
 	}, []);
 
+	function resetBoard() {
+		circuitBoard.resetBoard();
+		// Add switches
+		for (let currentSwitch of switchPositions) {
+			circuitBoard.addSwitch(currentSwitch[1], currentSwitch[0]);
+		}
+		// Add light
+		circuitBoard.addObject("light", lightPosition[0], lightPosition[1]);
+	}
+
 	// Remove all gates and wires from canvas
 	function resetCanvas(canvas) {
 		// Draw the grid lines on the grid canvas
 		function drawCanvasGridLines(color) {
 			const context = gridCanvasRef.current.getContext("2d");
-			context.clearRect(0, 0, gridCanvasRef.current.width, gridCanvasRef.current.height);
+			context.reset();
 			context.beginPath();
 			// Draw horizontal lines
 			for (let i = 0; i <= CANVAS_UNITS; i++) {
@@ -54,15 +64,16 @@ export function CircuitMapPage() {
 			context.stroke();
 		}
 
+		drawCanvasGridLines(gridCanvasRef.current);
 		const context = canvas.getContext("2d");
 		// context.clearRect(0, 0, gridCanvasRef.current.width, gridCanvasRef.current.height);
 		context.reset();
 		// Add switches to board
 		for (let currentSwitch of switchPositions) {
-			circuitBoard.addSwitch(currentSwitch[0], currentSwitch[1]);
+			circuitBoard.addSwitch(currentSwitch[1], currentSwitch[0]);
 		}
 		// Add light to board
-		circuitBoard.addObject("light", lightPosition[0], lightPosition[1]);
+		circuitBoard.addObject("light", lightPosition[1], lightPosition[0]);
 	}
 
 	// Given two coordinates on the canvas, find the nearest grid intersection and
@@ -80,9 +91,12 @@ export function CircuitMapPage() {
 
 		// See if they clicked on a switch. If they did, toggle the switch.
 		// Go through each switch position
-		for (let currentSwitch of switchPositions) {
-			if(currentSwitch[0] === clientPos[0] && currentSwitch[1] === clientPos[1]) {
-				circuitBoard.toggleSwitch(currentSwitch[0], currentSwitch[1]);
+		for (let i = 0; i < switchPositions.length; i++) {
+			if(clientPos[0] === switchPositions[i][0] && clientPos[1] === switchPositions[i][1]) {
+				circuitBoard.toggleSwitch(switchPositions[i][1], switchPositions[i][0]);
+				circuitBoard.propogatePower();
+				refreshCanvas();
+				return;
 			}
 		}
 
@@ -196,7 +210,7 @@ export function CircuitMapPage() {
 		const letters = ["A", "B", "C", "D"];
 		for (let i = 0; i < circuitBoard.switches.length; i++) {
 			const currentSwitch = circuitBoard.switches[i];
-			drawSwitch(canvas, currentSwitch[0], currentSwitch[1], letters[i], currentSwitch[2]);
+			drawSwitch(canvas, currentSwitch[1], currentSwitch[0], letters[i], currentSwitch[2]);
 		}
 	}
 
@@ -343,7 +357,9 @@ export function CircuitMapPage() {
 		<>
 			Circuit Map Page
 			<br />
-			<button onClick={() => {resetCanvas(mainCanvasRef.current)}}>Clear canvas</button>
+			<button onClick={() => {resetCanvas(mainCanvasRef.current)}}>Setup board</button>
+			<br />
+			<button onClick={() => {resetBoard()}}>Reset board obj</button>
 			<br />
 
 			<div>

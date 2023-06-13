@@ -25,17 +25,19 @@ export class CircuitBoard {
                 // If switch power not provied, flip the switch
                 if(switchPower === null) {
                     if(currentSwitch[2] === 0) {
-                        currentSwitch = 1;
+                        currentSwitch[2] = 1;
                     }
                     else {
-                        currentSwitch = 0;
+                        currentSwitch[2] = 0;
                     }
                 }
                 else {
                     currentSwitch[2] = switchPower;
                 }
+                return;
             }
         }
+        console.log("Switch to toggle not found.");
     }
 
     public addObject = (obj, x, y, x2=null, y2=null) => {
@@ -64,7 +66,7 @@ export class CircuitBoard {
 
         // Start by sending signals from the switches:
         for (let currentSwitch of this.switches) {
-            this.power[currentSwitch[0]][currentSwitch[1]] = currentSwitch[2];
+            this.power[currentSwitch[0]][currentSwitch[1] + 1] = currentSwitch[2];
         }
 
         let iterations = 0;
