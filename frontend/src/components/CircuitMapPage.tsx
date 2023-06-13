@@ -43,17 +43,16 @@ export function CircuitMapPage() {
 	}
 
 	function clearCanvas(canvas) {
-		circuitBoard.resetBoard();
 		const context = canvas.getContext("2d");
 		context.clearRect(0, 0, gridCanvasRef.current.width, gridCanvasRef.current.height);
 		context.reset();
 		drawCanvasGridLines(mainCanvasRef.current);
 		drawSwitches(mainCanvasRef.current);
-		drawLight(canvas, false);
+		drawLight(canvas, 0);
 	}
 
 	function drawLight(canvas, power) {
-		draw(canvas, "light", lightPosition[0], lightPosition[1], null, null,power=false);
+		draw(canvas, "light", lightPosition[0], lightPosition[1], null, null,power=0);
 	}
 
 	function drawSwitches(canvas) {
@@ -105,7 +104,7 @@ export function CircuitMapPage() {
 				hintCanvasRef.current.getContext("2d").clearRect(0, 0, mainCanvasRef.current.width, mainCanvasRef.current.height);
 
 				circuitBoard.addObject("wire", wireStart[1], wireStart[0], clientPos[1], clientPos[0]);
-				draw(mainCanvasRef.current, toolInHand, wireStart[0], wireStart[1], clientPos[0], clientPos[1], false, false);
+				draw(mainCanvasRef.current, toolInHand, wireStart[0], wireStart[1], clientPos[0], clientPos[1], 0, false);
 				wireStart[0] = null;
 				wireStart[1] = null;
 			}
@@ -114,7 +113,7 @@ export function CircuitMapPage() {
 			// Clear hint canvas
 			hintCanvasRef.current.getContext("2d").clearRect(0, 0, mainCanvasRef.current.width, mainCanvasRef.current.height);
 			circuitBoard.addObject(toolInHand, clientPos[1], clientPos[0]);
-			draw(mainCanvasRef.current, toolInHand, clientPos[0],clientPos[1], null, null, false, false);
+			draw(mainCanvasRef.current, toolInHand, clientPos[0],clientPos[1], null, null, 0, false);
 		}
 	}
 
@@ -142,14 +141,14 @@ export function CircuitMapPage() {
 			if(toolInHand === "wire") {
 				// If we have a wire start
 				if(wireStart[0] !== null && wireStart[1] !== null) {
-					draw(hintCanvasRef.current, toolInHand, wireStart[0], wireStart[1], clientPos[0], clientPos[1], false, true);
+					draw(hintCanvasRef.current, toolInHand, wireStart[0], wireStart[1], clientPos[0], clientPos[1], 0, true);
 				}
 				else {
-					draw(hintCanvasRef.current, toolInHand, clientPos[0], clientPos[1], clientPos[0], clientPos[1], false, true);
+					draw(hintCanvasRef.current, toolInHand, clientPos[0], clientPos[1], clientPos[0], clientPos[1], 0, true);
 				}
 			}
 			else {
-				draw(hintCanvasRef.current, toolInHand, clientPos[0], clientPos[1], null, null, false, true);
+				draw(hintCanvasRef.current, toolInHand, clientPos[0], clientPos[1], null, null, 0, true);
 			}
 		}
 	}
@@ -172,6 +171,28 @@ export function CircuitMapPage() {
 		context.strokeStyle = color;
 		context.lineWidth = 0.1;
 		context.stroke();
+	}
+
+	function drawCanvas() {
+		const canvas = mainCanvasRef.current;
+		clearCanvas(canvas);
+
+		// For each row
+		for (let i = 0; i < circuitBoard.objects.length; i++) {
+			// For each cell
+			for (let j = 0; j < circuitBoard.objects[0].length; j++) {
+				// For each object
+				for (let object of circuitBoard.objects[i][j]) {
+					console.log("here");
+					if(object[0] === "wire") {
+						draw(mainCanvasRef.current, "wire", j, i, object[2], object[1], object[3]);
+					}
+					else {
+						draw(mainCanvasRef.current, object[0], j, i, null, null, object[3]);
+					}
+				}
+			}
+		}
 	}
 
 	function drawSwitch(canvas, x, y, text, power= 0) {
@@ -201,7 +222,7 @@ export function CircuitMapPage() {
 
 	// Draw the specified shape.
 	// If wire, x2 and y2 must also be specified.
-	function draw(canvas, obj, x1, y1, x2, y2, power=false, hint=false) {
+	function draw(canvas, obj, x1, y1, x2, y2, power=0, hint=false) {
 		const context = canvas.getContext("2d");
 		context.lineWidth = 2;
 
@@ -271,6 +292,10 @@ export function CircuitMapPage() {
 			context.arc(x1 * UNIT_SIZE, y1 * UNIT_SIZE, 1 * UNIT_SIZE, Math.PI, 0, false);
 			context.lineTo((x1 + 1) * UNIT_SIZE, (y1 + 0.5) * UNIT_SIZE);
 			context.closePath();
+			if(power) {
+				context.fillStyle = COLORS.YELLOW;
+				context.fill();
+			}
 			context.stroke();
 		}
 		else if(obj === "wire") {
@@ -281,6 +306,10 @@ export function CircuitMapPage() {
 			if(hint) {
 				context.strokeStyle = COLORS.DARK_GRAY;
 				context.fillStyle = COLORS.DARK_GRAY;
+			}
+			if(power) {
+				context.strokeStyle = COLORS.YELLOW;
+				context.fillStyle = COLORS.YELLOW;
 			}
 			context.stroke();
 			context.fill();
@@ -294,6 +323,9 @@ export function CircuitMapPage() {
 			context.lineTo(x2 * UNIT_SIZE, y2 * UNIT_SIZE);
 			context.stroke();
 			context.fill();
+		}
+		else {
+			alert("Cannot draw an object that does not exist");
 		}
 	}
 
@@ -317,7 +349,7 @@ export function CircuitMapPage() {
 
 			<button onClick={() => {console.log(circuitBoard.objects)}}>List objects</button>
 			<button onClick={() => {circuitBoard.propogatePower()}}>Propogate</button>
-			<button onClick={() => {console.log(circuitBoard.power)}}>List power</button>
+			<button onClick={drawCanvas}>Draw canvas</button>
 
 			<div className="relative">
 				<canvas ref={gridCanvasRef} className="bg-red-600 absolute pointer-events-none" width={CANVAS_UNITS * UNIT_SIZE} height={CANVAS_UNITS * UNIT_SIZE}></canvas>

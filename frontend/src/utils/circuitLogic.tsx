@@ -76,6 +76,11 @@ export class CircuitBoard {
                                 object[3] = 1;
                                 propogated = true;
                             }
+                            // If this endpoint is on but the wire isn't on, turn on wire
+                            if(this.power[i][j] && object[3] === 0) {
+                                object[3] = 1;
+                                propogated = true;
+                            }
                         }
                         // If AND gate
                         else if(object[0] === "AND") {
