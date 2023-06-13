@@ -1,71 +1,149 @@
 
+export class CircuitBoard {
 
-class CircuitBoard {
-    public wirePairs;
-    public andGates;
-    public orGates;
-    public notGates;
-    public inputs;
-    public lights;
+    public objects;
+    public power;
+    public switches;
+    public width;
+    public height;
 
-    constructor() {
-        this.wirePairs = [];
-        this.andGates = [];
-        this.orGates = [];
-        this.notGates = [];
-        this.inputs = [];
-        this.lights = [];
+    constructor(width, height) {
+        this.width = width;
+        this.height = height;
+        // Create a matrix. Each cell contains everything that's part of that cell.
+        this.resetBoard();
     }
 
-    public addWire = (x1, y1, x2, y2) => {
-        this.wirePairs.push([x1, y1, x2, y2]);
-        this.wirePairs.push([x2, y2, x1, y1]);
+    public addSwitch = (x, y) => {
+        this.switches.push([x, y, 0]);
     }
 
-    public addObject = (obj, x, y) => {
-        if(obj === "AND") {
-            this.andGates.push([x, y]);
-        }
-        else if(obj === "OR") {
-            this.orGates.push([x, y]);
-        }
-        else if(obj === "NOT") {
-            this.notGates.push([x, y]);
-        }
-        else if (obj === "inputs") {
-            this.inputs.push([x, y]);
-        }
-        else if(obj === "lights") {
-            this.lights.push([x, y]);
-        }
-        else {
-            console.log("Class CircuitBoard: invalid object passed to addObject:", obj);
-        }
-    }
-
-    // Clears a grid spot: wires that start/end and objects centered on this grid spot
-    // will be removed;
-    public clearSelection(x, y) {
-        // Find wires that start/end here
-        for (let i = this.wirePairs.length; i >= 0; i--) {
-            // If wire start or end matches
-            if((this.wirePairs[i][0] === x && this.wirePairs[i][1] === y) ||
-                (this.wirePairs[i][2] === x && this.wirePairs[i][3] === y)){
-                this.wirePairs.splice(i, 1);
+    public toggleSwitch = (switchX, switchhY, switchPower: 0 | 1) => {
+        // Find the switch
+        for (let currentSwitch of this.switches) {
+            if(currentSwitch[0] === switchX && currentSwitch[1] === switchhY) {
+                currentSwitch[2] = switchPower;
             }
         }
-        // Find objects that are centered here
-        function removeMatches(array, x, y) {
-            for (let i = array.length; i >= 0; i--) {
-                if(array[i][0] === x &&array[i][1] === y) {
-                    array.splice(i, 1);
+    }
+
+    public addObject = (obj, x, y, x2=null, y2=null) => {
+        if(obj === "wire") {
+            this.objects[x][y].push(["wire", x2, y2, 0]);
+            this.objects[x2][y2].push(["wire", x, y, 0]);
+        }
+        else {
+            this.objects[x][y].push([obj, x, y, 0]);
+        }
+    }
+
+    public resetPower = () => {
+        for (let i = 0; i < this.power.length; i++) {
+            for (let j = 0; j < this.power[0].length; j++) {
+                this.power[i][j] = 0;
+                for (let object of this.objects[i][j]) {
+                    object[3] = 0;
                 }
             }
         }
-        removeMatches(this.andGates, x, y);
-        removeMatches(this.orGates, x, y);
-        removeMatches(this.notGates, x, y);
-        removeMatches(this.inputs, x, y);
-        removeMatches(this.lights, x, y);
+    }
+
+    public propogatePower = () => {
+        this.resetPower();
+
+        // Start by sending signals from the switches:
+        for (let currentSwitch of this.switches) {
+            this.power[currentSwitch[0]][currentSwitch[1]] = currentSwitch[2];
+        }
+
+        let iterations = 0;
+        // Iterate propogating to neighbors until no one propogates anything:
+        let propogated = true;
+        while(propogated) {
+            propogated = false;
+
+            // For each row
+            for (let i = 0; i < this.objects.length; i++) {
+                // For each column
+                for (let j = 0; j < this.objects[0].length; j++) {
+                    // For each cell
+                    for (let object of this.objects[i][j]) {
+                        // If wire
+                        if(object[0] === "wire") {
+                            // If this endpoint is on, but the other isn't, turn other on
+                            if(this.power[i][j] && !this.power[object[1]][object[2]]) {
+                                this.power[object[1]][object[2]] = 1;
+                                object[3] = 1;
+                                propogated = true;
+                            }
+                        }
+                        // If AND gate
+                        else if(object[0] === "AND") {
+                            // If both inputs on and output isn't, propograte
+                            if(this.power[i - 1][j - 1] && this.power[i + 1][j - 1] && !this.power[i][j + 1]) {
+                                this.power[i][j + 1] = 1;
+                                object[3] = 1;
+                                propogated = true;
+                            }
+                        }
+                        // If OR gate
+                        else if(object[0] === "OR") {
+                            // If either input is on and output isn't, propogate
+                            if((this.power[i - 1][j - 1] || this.power[i + 1][j - 1]) && !this.power[i][j + 1]) {
+                                this.power[i][j + 1] = 1;
+                                object[3] = 1;
+                                propogated = true;
+                            }
+                        }
+                        // If NOT gate
+                        else if(object[0] === "NOT") {
+                            // If input and output are not opposite, propogate
+                            if(this.power[i][j - 1] === 1 && this.power[i][j + 1] === 1) {
+                                this.power[i][j + 1] = 0;
+                                object[3] = 1;
+                                propogated = true;
+                            }
+                            else if(this.power[i][j - 1] === 0 && this.power[i][j + 1] === 0) {
+                                this.power[i][j + 1] = 1;
+                                object[3] = 0;
+                                propogated = true;
+                            }
+                        }
+                        // If light
+                        else if(object[0] === "light") {
+                            // If light is not what is should be
+                            if(object[3] === 0 && this.power[i + 1][j] === 1) {
+                                object[3] = 1;
+                                propogated = true;
+                            }
+                            else if(object[3] === 1 && this.power[i + 1][j] === 0) {
+                                object[3] = 0;
+                                propogated = true;
+                            }
+                        }
+                    }
+                }
+            }
+            // If we reached 1000 iterations, there's probably a loop:
+            if(++iterations >= 1000) {
+                return false;
+            }
+            console.log(iterations);
+        }
+        return true;
+    }
+
+    public resetBoard = () => {
+        this.objects = new Array(this.height);
+        this.power = new Array(this.height);
+        for (let i = 0; i < this.height; i++) {
+            this.objects[i] = new Array(this.width);
+            this.power[i] = new Array(this.width);
+            for (let j = 0; j < this.width; j++) {
+                this.objects[i][j] = [];
+                this.power[i][j] = 0;
+            }
+        }
+        this.switches = [];
     }
 }

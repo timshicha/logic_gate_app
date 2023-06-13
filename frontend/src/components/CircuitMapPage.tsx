@@ -1,5 +1,6 @@
 import React, { Component, useEffect, useRef, useState } from "react";
 import { COLORS } from "@/utils/constants.tsx";
+import { CircuitBoard } from "@/utils/circuitLogic.tsx";
 
 // How many "blocks" the canvas should be. The more blocks, the
 // bigger the grid. This allows the user to place gates and wires
@@ -20,6 +21,7 @@ export function CircuitMapPage() {
 	// Where the user's last coordinates were
 	const [clientPos, setClientPost] = useState([0, 0]);
 	const [switches] = useState([0, 0, 0, 0]);
+	const [circuitBoard] = useState(new CircuitBoard(CANVAS_UNITS, CANVAS_UNITS));
 
 	useEffect(() => {
 		// Add a listener to detect canvas clicks
@@ -41,6 +43,7 @@ export function CircuitMapPage() {
 	}
 
 	function clearCanvas(canvas) {
+		circuitBoard.resetBoard();
 		const context = canvas.getContext("2d");
 		context.clearRect(0, 0, gridCanvasRef.current.width, gridCanvasRef.current.height);
 		context.reset();
@@ -98,17 +101,20 @@ export function CircuitMapPage() {
 			}
 			// Otherwise, place the wire
 			else {
+				// Clear hint canvas
+				hintCanvasRef.current.getContext("2d").clearRect(0, 0, mainCanvasRef.current.width, mainCanvasRef.current.height);
 
+				circuitBoard.addObject("wire", wireStart[1], wireStart[0], clientPos[1], clientPos[0]);
 				draw(mainCanvasRef.current, toolInHand, wireStart[0], wireStart[1], clientPos[0], clientPos[1], false, false);
 				wireStart[0] = null;
 				wireStart[1] = null;
-				hintCanvasRef.current.getContext("2d").clearRect(0, 0, mainCanvasRef.current.width, mainCanvasRef.current.height);
 			}
 		}
 		else {
 			// Clear hint canvas
-			draw(mainCanvasRef.current, toolInHand, clientPos[0],clientPos[1], null, null, false, false);
 			hintCanvasRef.current.getContext("2d").clearRect(0, 0, mainCanvasRef.current.width, mainCanvasRef.current.height);
+			circuitBoard.addObject(toolInHand, clientPos[1], clientPos[0]);
+			draw(mainCanvasRef.current, toolInHand, clientPos[0],clientPos[1], null, null, false, false);
 		}
 	}
 
@@ -308,6 +314,10 @@ export function CircuitMapPage() {
 				<button onClick={() => toolInHand = "light"}>Light</button>
 			</div>
 			<br />
+
+			<button onClick={() => {console.log(circuitBoard.objects)}}>List objects</button>
+			<button onClick={() => {circuitBoard.propogatePower()}}>Propogate</button>
+			<button onClick={() => {console.log(circuitBoard.power)}}>List power</button>
 
 			<div className="relative">
 				<canvas ref={gridCanvasRef} className="bg-red-600 absolute pointer-events-none" width={CANVAS_UNITS * UNIT_SIZE} height={CANVAS_UNITS * UNIT_SIZE}></canvas>
