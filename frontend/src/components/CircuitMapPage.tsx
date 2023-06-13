@@ -1,18 +1,18 @@
 import React, { Component, useEffect, useRef, useState } from "react";
 import { COLORS } from "@/utils/constants.tsx";
 
+// How many "blocks" the canvas should be. The more blocks, the
+// bigger the grid. This allows the user to place gates and wires
+// on a bigger board.
+const CANVAS_UNITS = 40;
+// How many pixels each "block" should be.
+const UNIT_SIZE = 15;
 let toolInHand = "wire";
-
 const switchPositions = [[2, 5], [2, 15], [2, 25], [2, 35]];
+const lightPosition = [CANVAS_UNITS - 2, 20];
 
 export function CircuitMapPage() {
 
-	// How many "blocks" the canvas should be. The more blocks, the
-	// bigger the grid. This allows the user to place gates and wires
-	// on a bigger board.
-	const CANVAS_UNITS = 40;
-	// How many pixels each "block" should be.
-	const UNIT_SIZE = 15;
 	const mainCanvasRef = useRef(null);
 	const gridCanvasRef = useRef(null);
 	const hintCanvasRef = useRef(null);
@@ -46,6 +46,11 @@ export function CircuitMapPage() {
 		context.reset();
 		drawCanvasGridLines(mainCanvasRef.current);
 		drawSwitches(mainCanvasRef.current);
+		drawLight(canvas, false);
+	}
+
+	function drawLight(canvas, power) {
+		draw(canvas, "light", lightPosition[0], lightPosition[1], null, null,power=false);
 	}
 
 	function drawSwitches(canvas) {
