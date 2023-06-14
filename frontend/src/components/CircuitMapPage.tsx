@@ -6,6 +6,7 @@ import AND_img from "@/assets/images/AND.svg";
 import OR_img from "@/assets/images/OR.svg";
 import NOT_img from "@/assets/images/NOT.svg";
 import wire_img from "@/assets/images/wire.svg";
+import {Navigate, useNavigate} from "react-router-dom";
 
 
 // How many "blocks" the canvas should be. The more blocks, the
@@ -19,7 +20,17 @@ const switchPositions = [[2, 5], [2, 15], [2, 25], [2, 35]];
 const lightPosition = [CANVAS_UNITS - 2, 20];
 
 export function CircuitMapPage() {
+	
+	// Check the user's current map name.
+	// If one exists, that's the map they'll load. Otherwise,
+	// redirect them home.
+	let currentMapName = sessionStorage.getItem("currentMap");
+	if(currentMapName == null) {
+		currentMapName = "Untitled Map";
+		// return <Navigate to="/" />;
+	}
 
+	const [mapTitle, setMapTitle] = useState(currentMapName);
 	const mainCanvasRef = useRef(null);
 	const gridCanvasRef = useRef(null);
 	const hintCanvasRef = useRef(null);
@@ -378,12 +389,12 @@ export function CircuitMapPage() {
 		console.log(json);
 		circuitBoard.JsonToBoard(json);
 		refreshCanvas();
+		console.log();
 	}
 
 	return (
 		<>
-			Circuit Map Page
-			<br />
+			<h1 className="text-[50px]">{mapTitle}</h1>
 			
 			Email: <input type={"text"} id={"a"}/>
 			<br />
@@ -404,7 +415,7 @@ export function CircuitMapPage() {
 			</div>
 			<button onClick={() => {resetBoard(); refreshCanvas();}} className={"w-[150px] h-[40px] m-[5px] bg-gray-500 rounded-lg text-lg"}>Clear Board</button>
 			<button onClick={saveCircuitToCloud} className={"w-[150px] h-[40px] m-[5px] bg-gray-500 rounded-lg text-lg"}>Save to cloud</button>
-			<button onClick={loadCircuitFromCloud} className={"w-[150px] h-[40px] m-[5px] bg-gray-500 rounded-lg text-lg"}>Load most recent save</button>
+			<button onClick={loadCircuitFromCloud} className={"w-[220px] h-[40px] m-[5px] bg-gray-500 rounded-lg text-lg"}>Load most recent save</button>
 		</>
 	);
 }
