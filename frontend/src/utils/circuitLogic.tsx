@@ -172,4 +172,18 @@ export class CircuitBoard {
         }
         this.switches = [];
     }
+    
+    public boardToJson = () => {
+        const data = {
+            objects: this.objects,
+            switches: this.switches
+        };
+        return JSON.stringify(data);
+    }
+    
+    public JsonToBoard = (jsonStr) => {
+        const data = JSON.parse(jsonStr);
+        this.objects = data.objects;
+        this.switches = data.switches;
+    }
 }

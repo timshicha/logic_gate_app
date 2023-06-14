@@ -1,4 +1,4 @@
-import {UpdateMapService} from "@/Services/MapServices.tsx";
+import {RetrieveMapService, UpdateMapService} from "@/Services/MapServices.tsx";
 import React, { Component, useEffect, useRef, useState } from "react";
 import { COLORS } from "@/utils/constants.tsx";
 import { CircuitBoard } from "@/utils/circuitLogic.tsx";
@@ -365,7 +365,19 @@ export function CircuitMapPage() {
 		const email = document.getElementById("a").value;
 		const mapTitle = document.getElementById("b").value;
 		const newMap = document.getElementById("c").value;
-		await UpdateMapService(email, mapTitle, newMap);
+		const json = circuitBoard.boardToJson();
+		await UpdateMapService(email, mapTitle, json);
+	}
+	
+	async function loadCircuitFromCloud() {
+		console.log("Loading from cloud");
+		const email = document.getElementById("a").value;
+		const mapTitle = document.getElementById("b").value;
+		const result = await RetrieveMapService(email, mapTitle);
+		const json = result.data.circuitMap;
+		console.log(json);
+		circuitBoard.JsonToBoard(json);
+		refreshCanvas();
 	}
 
 	return (
@@ -392,6 +404,7 @@ export function CircuitMapPage() {
 			</div>
 			<button onClick={() => {resetBoard(); refreshCanvas();}} className={"w-[150px] h-[40px] m-[5px] bg-gray-500 rounded-lg text-lg"}>Clear Board</button>
 			<button onClick={saveCircuitToCloud} className={"w-[150px] h-[40px] m-[5px] bg-gray-500 rounded-lg text-lg"}>Save to cloud</button>
+			<button onClick={loadCircuitFromCloud} className={"w-[150px] h-[40px] m-[5px] bg-gray-500 rounded-lg text-lg"}>Load most recent save</button>
 		</>
 	);
 }
