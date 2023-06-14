@@ -8,7 +8,7 @@ export function googleLogin() {
 		"response_type": "token",
 		"scope": "https://www.googleapis.com/auth/userinfo.profile",
 		"include_granted_scopes": true,
-		// "state": "pass-through value"
+		"state": "pass-through value"
 	};
 // Google's OAuth 2.0 endpoint for requesting an access token
 	const oauth2Endpoint = 'https://accounts.google.com/o/oauth2/v2/auth';

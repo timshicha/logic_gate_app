@@ -1,11 +1,21 @@
-import React from "react";
+import React, {useEffect} from "react";
 import circuit_img from "@/assets/images/circuit.svg";
+import {useSearchParams} from "react-router-dom";
 
 export function HomePage() {
-	// If there is an access token in URL params, extract it.
-	// We were redirected from Google.
 	
-	
+	useEffect(() => {
+		// If there is an access token in URL params, extract it.
+		// We were redirected from Google.
+		const paramsStr = "?" + window.location.href.replace(import.meta.env.CLIENT_URL, "").replace("/", "").replace("#", "");
+		const params = new URLSearchParams(paramsStr);
+		
+		if(params.get("access_token")) {
+			console.log(params.get("access_token"));
+			window.history.replaceState(null, null, "/");
+		}
+		
+	}, []);
 	
 	return (
 		<>
