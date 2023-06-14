@@ -37,8 +37,10 @@ export function CircuitMapPage() {
 		mainCanvasRef.current.addEventListener("mousedown", handleCanvasClick);
 		mainCanvasRef.current.addEventListener("mousemove", event => handleCanvasMove(event));
 		return () => {
-			mainCanvasRef.current.removeEventListener("mousedown", handleCanvasClick);
-			mainCanvasRef.current.removeEventListener("mousemove", event => handleCanvasMove(event));
+			if (mainCanvasRef && mainCanvasRef.current) {
+				mainCanvasRef.current.removeEventListener("mousedown", handleCanvasClick);
+				mainCanvasRef.current.removeEventListener("mousemove", event => handleCanvasMove(event));
+			}
 		}
 	}, []);
 
@@ -355,25 +357,29 @@ export function CircuitMapPage() {
 			alert("Cannot draw an object that does not exist");
 		}
 	}
+	
+	async function saveCircuitToCloud() {
+		console.log("Saving to cloud");
+		await fetch(import.meta.env.API_URL);
+	}
 
 	return (
 		<>
 			Circuit Map Page
 			<br />
-			<button onClick={() => {resetBoard(); refreshCanvas();}}>Clear board</button>
-			<br />
-			
 			
 			<input type="image" src={AND_img} alt="AND tool" onClick={() => {toolInHand = "AND"; setToolInHandState("AND");}} className={"w-[50px] h-[50px] m-[5px] rounded-lg " + (toolInHandState === "AND" ? "bg-green-500" : "bg-gray-500")}/>
 			<input type="image" src={OR_img} alt="OR tool" onClick={() => {toolInHand = "OR"; setToolInHandState("OR"); }} className={"w-[50px] h-[50px] bg-gray-500 m-[5px] rounded-lg " + (toolInHandState === "OR" ? "bg-green-500" : "bg-gray-500")}/>
 			<input type="image" src={NOT_img} alt="NOT tool" onClick={() => {toolInHand = "NOT"; setToolInHandState("NOT");}} className={"w-[50px] h-[50px] bg-gray-500 m-[5px] rounded-lg " + (toolInHandState === "NOT" ? "bg-green-500" : "bg-gray-500")}/>
 			<input type="image" src={wire_img} alt="Wire tool" onClick={() => {toolInHand = "wire"; setToolInHandState("wire");}} className={"w-[50px] h-[50px] bg-gray-500 m-[5px] rounded-lg " + (toolInHandState === "wire" ? "bg-green-500" : "bg-gray-500")}/>
-
-			<div className="relative">
+			
+			<div className={"relative block mb-[" + (CANVAS_UNITS * UNIT_SIZE).toString() + "px]"}>
 				<canvas ref={gridCanvasRef} className="bg-red-600 absolute pointer-events-none" width={CANVAS_UNITS * UNIT_SIZE} height={CANVAS_UNITS * UNIT_SIZE}></canvas>
 				<canvas ref={mainCanvasRef} className="absolute" width={CANVAS_UNITS * UNIT_SIZE} height={CANVAS_UNITS * UNIT_SIZE}></canvas>
 				<canvas ref={hintCanvasRef} className="absolute pointer-events-none" width={CANVAS_UNITS * UNIT_SIZE} height={CANVAS_UNITS * UNIT_SIZE}></canvas>
 			</div>
+			<button onClick={() => {resetBoard(); refreshCanvas();}} className={"w-[150px] h-[40px] m-[5px] bg-gray-500 rounded-lg text-lg"}>Clear Board</button>
+			<button onClick={saveCircuitToCloud} className={"w-[150px] h-[40px] m-[5px] bg-gray-500 rounded-lg text-lg"}>Save to cloud</button>
 		</>
 	);
 }
