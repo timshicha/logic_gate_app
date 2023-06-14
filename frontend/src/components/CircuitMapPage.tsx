@@ -43,7 +43,7 @@ export function CircuitMapPage() {
 	useEffect(() => {
 		resetBoard();
 		resetCanvas(mainCanvasRef.current);
-		refreshCanvas();
+		// loadCircuitFromCloud();
 		
 		// Add a listener to detect canvas clicks
 		mainCanvasRef.current.addEventListener("mousedown", handleCanvasClick);
@@ -371,9 +371,8 @@ export function CircuitMapPage() {
 	}
 	
 	async function saveCircuitToCloud() {
-		console.log("Saving to cloud");
 		await fetch(import.meta.env.API_URL);
-		const email = document.getElementById("a").value;
+		const email = localStorage.getItem("email");
 		const mapTitle = document.getElementById("b").value;
 		const newMap = document.getElementById("c").value;
 		const json = circuitBoard.boardToJson();
@@ -381,15 +380,19 @@ export function CircuitMapPage() {
 	}
 	
 	async function loadCircuitFromCloud() {
-		console.log("Loading from cloud");
-		const email = document.getElementById("a").value;
+		const email = localStorage.getItem("email");
 		const mapTitle = document.getElementById("b").value;
 		const result = await RetrieveMapService(email, mapTitle);
 		const json = result.data.circuitMap;
-		console.log(json);
-		circuitBoard.JsonToBoard(json);
+		// If the json is very short, then the map wasn't set up. Provide them with
+		// a set up map, and it will be saved on next DB save.
+		if(json.length < 10) {
+			resetBoard();
+		}
+		else {
+			circuitBoard.JsonToBoard(json);
+		}
 		refreshCanvas();
-		console.log();
 	}
 
 	return (
