@@ -397,9 +397,9 @@ export function CircuitMapPage() {
 			<br />
 			
 			<input type="image" src={AND_img} alt="AND tool" onClick={() => {toolInHand = "AND"; setToolInHandState("AND");}} className={"w-[50px] h-[50px] m-[5px] rounded-lg " + (toolInHandState === "AND" ? "bg-green-500" : "bg-gray-500")}/>
-			<input type="image" src={OR_img} alt="OR tool" onClick={() => {toolInHand = "OR"; setToolInHandState("OR"); }} className={"w-[50px] h-[50px] bg-gray-500 m-[5px] rounded-lg " + (toolInHandState === "OR" ? "bg-green-500" : "bg-gray-500")}/>
-			<input type="image" src={NOT_img} alt="NOT tool" onClick={() => {toolInHand = "NOT"; setToolInHandState("NOT");}} className={"w-[50px] h-[50px] bg-gray-500 m-[5px] rounded-lg " + (toolInHandState === "NOT" ? "bg-green-500" : "bg-gray-500")}/>
-			<input type="image" src={wire_img} alt="Wire tool" onClick={() => {toolInHand = "wire"; setToolInHandState("wire");}} className={"w-[50px] h-[50px] bg-gray-500 m-[5px] rounded-lg " + (toolInHandState === "wire" ? "bg-green-500" : "bg-gray-500")}/>
+			<input type="image" src={OR_img} alt="OR tool" onClick={() => {toolInHand = "OR"; setToolInHandState("OR"); }} className={"w-[50px] h-[50px] m-[5px] rounded-lg " + (toolInHandState === "OR" ? "bg-green-500" : "bg-gray-500")}/>
+			<input type="image" src={NOT_img} alt="NOT tool" onClick={() => {toolInHand = "NOT"; setToolInHandState("NOT");}} className={"w-[50px] h-[50px] m-[5px] rounded-lg " + (toolInHandState === "NOT" ? "bg-green-500" : "bg-gray-500")}/>
+			<input type="image" src={wire_img} alt="Wire tool" onClick={() => {toolInHand = "wire"; setToolInHandState("wire");}} className={"w-[50px] h-[50px] m-[5px] rounded-lg " + (toolInHandState === "wire" ? "bg-green-500" : "bg-gray-500")}/>
 			
 			<div className={"relative block mb-[" + (CANVAS_UNITS * UNIT_SIZE).toString() + "px]"}>
 				<canvas ref={gridCanvasRef} className="bg-red-600 absolute pointer-events-none" width={CANVAS_UNITS * UNIT_SIZE} height={CANVAS_UNITS * UNIT_SIZE}></canvas>

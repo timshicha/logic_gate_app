@@ -26,3 +26,12 @@ export async function RetriveAllMapsService(userEmail) {
 	const response = await httpClient.search("/circuitmaps/all", data);
 	return response;
 }
+
+export async function DeleteMapService(userEmail, mapTitle) {
+	const data = {
+		email: userEmail,
+		mapTitle: mapTitle
+	};
+	const response = await httpClient.delete(import.meta.env.API_URL + "/circuitmaps", {data: data});
+	return response;
+}

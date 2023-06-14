@@ -1,6 +1,7 @@
-import {RetriveAllMapsService} from "@/Services/MapServices.tsx";
+import {RetriveAllMapsService, DeleteMapService} from "@/Services/MapServices.tsx";
 import React, {useEffect, useState} from "react";
 import {Navigate} from "react-router-dom";
+import delete_img from "@/assets/images/delete.svg";
 
 export function MyMapsPage() {
 	
@@ -39,21 +40,32 @@ export function MyMapsPage() {
 		setNavigateToMap(true);
 	}
 	
+	async function deleteMap(mapTitle) {
+		await DeleteMapService(email, mapTitle);
+		await getMapList();
+	}
+	
 	function createHTMLCode() {
 		setMapsHTML(
 			<>
-				{mapTitles.map((title) => <li><button onClick={() => goToMapPage(title)}>{title}</button></li>)}
+				{mapTitles.map((title) =>
+				<li key={title} className={"mt-[10px]"}>
+					<button onClick={() => goToMapPage(title)} className={"w-[400px] h-[40px] m-[5px] bg-gray-500 rounded-lg text-lg overflow-hidden align-middle"}>{title}</button>
+					<button onClick={() => deleteMap((title))}><img alt={"delete " + title} src={delete_img} className={"w-[50px] h-[50px] m-[5px] rounded-lg bg-red-600 inline-block"}/></button>
+				</li>)}
 				</>
 		);
 	}
 	
 	return (
 		<>
+			<h1 className="text-[50px]">My Maps</h1>
 			{navigateToLogin && <Navigate to="/login" />}
 			{navigateToMap && <Navigate to="/circuitmap" />}
-			My Maps Page
 			<br />
+			<ul>
 			{mapsHTML}
+			</ul>
 		</>
 	);
 }
