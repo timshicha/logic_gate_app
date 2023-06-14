@@ -1,3 +1,4 @@
+import {UpdateMapService} from "@/Services/MapServices.tsx";
 import React, { Component, useEffect, useRef, useState } from "react";
 import { COLORS } from "@/utils/constants.tsx";
 import { CircuitBoard } from "@/utils/circuitLogic.tsx";
@@ -361,11 +362,22 @@ export function CircuitMapPage() {
 	async function saveCircuitToCloud() {
 		console.log("Saving to cloud");
 		await fetch(import.meta.env.API_URL);
+		const email = document.getElementById("a").value;
+		const mapTitle = document.getElementById("b").value;
+		const newMap = document.getElementById("c").value;
+		await UpdateMapService(email, mapTitle, newMap);
 	}
 
 	return (
 		<>
 			Circuit Map Page
+			<br />
+			
+			Email: <input type={"text"} id={"a"}/>
+			<br />
+			Map title: <input type={"text"} id={"b"}/>
+			<br />
+			New map: <input type={"text"} id={"c"}/>
 			<br />
 			
 			<input type="image" src={AND_img} alt="AND tool" onClick={() => {toolInHand = "AND"; setToolInHandState("AND");}} className={"w-[50px] h-[50px] m-[5px] rounded-lg " + (toolInHandState === "AND" ? "bg-green-500" : "bg-gray-500")}/>
