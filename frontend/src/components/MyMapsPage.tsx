@@ -7,7 +7,10 @@ export function MyMapsPage() {
 	
 	// See if email is set:
 	let email = localStorage.getItem("email");
-	const [navigateToLogin, setNavigateToLogin] = useState(email ? false : true);
+	if(!email) {
+		return <Navigate to="/login" />;
+	}
+	const [navigateToLogin, setNavigateToLogin] = useState(false);
 	// Otherwise, try loading maps
 	const [mapTitles] = useState([]);
 	const [mapsHTML, setMapsHTML] = useState(<></>);
