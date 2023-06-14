@@ -1,4 +1,4 @@
-import {Entity, ManyToOne, Property } from "@mikro-orm/core";
+import {Entity, ManyToOne, Property, TextType} from "@mikro-orm/core";
 import type { Ref, Rel } from "@mikro-orm/core";
 import {AppBaseEntity} from "./AppBaseEntity.js";
 import {User} from "./User.js";
@@ -14,6 +14,6 @@ export class CircuitMap extends AppBaseEntity {
 	title!: string;
 	
 	// The map as a json string
-	@Property()
+	@Property({ type: TextType, nullable: true })
 	circuitMap!: string;
 }

@@ -121,12 +121,12 @@
         },
         "circuit_map": {
           "name": "circuit_map",
-          "type": "varchar(255)",
+          "type": "text",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": false,
-          "mappedType": "string"
+          "nullable": true,
+          "mappedType": "text"
         }
       },
       "name": "circuit_map",
