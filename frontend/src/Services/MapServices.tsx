@@ -7,7 +7,6 @@ export async function UpdateMapService(userEmail, mapTitle, newMapAsJsonStr) {
 		newMap: newMapAsJsonStr
 	};
 	const response = await httpClient.put(import.meta.env.API_URL + "/circuitmaps", data);
-	console.log(response);
 	return response;
 }
 
@@ -17,6 +16,13 @@ export async function RetrieveMapService(userEmail, mapTitle) {
 		mapTitle: mapTitle
 	};
 	const response = await httpClient.search("/circuitmaps", data);
-	console.log(response);
+	return response;
+}
+
+export async function RetriveAllMapsService(userEmail) {
+	const data = {
+		email: userEmail
+	};
+	const response = await httpClient.search("/circuitmaps/all", data);
 	return response;
 }

@@ -70,7 +70,7 @@ export function CircuitMapRoutesInit(app: FastifyInstance) {
 			for (let i of user.circuitMaps) {
 				maps.push(i.title);
 			}
-			return maps;
+			return reply.send(maps);
 		} catch (err) {
 			reply.status(500).send(err);
 		}
