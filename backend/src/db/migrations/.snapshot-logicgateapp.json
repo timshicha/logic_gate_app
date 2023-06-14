@@ -133,6 +133,15 @@
       "schema": "public",
       "indexes": [
         {
+          "columnNames": [
+            "title"
+          ],
+          "composite": false,
+          "keyName": "circuit_map_title_unique",
+          "primary": false,
+          "unique": true
+        },
+        {
           "keyName": "circuit_map_pkey",
           "columnNames": [
             "id"
