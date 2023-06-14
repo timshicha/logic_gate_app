@@ -1,6 +1,11 @@
 import React, { Component, useEffect, useRef, useState } from "react";
 import { COLORS } from "@/utils/constants.tsx";
 import { CircuitBoard } from "@/utils/circuitLogic.tsx";
+import AND_img from "@/assets/images/AND.svg";
+import OR_img from "@/assets/images/OR.svg";
+import NOT_img from "@/assets/images/NOT.svg";
+import wire_img from "@/assets/images/wire.svg";
+
 
 // How many "blocks" the canvas should be. The more blocks, the
 // bigger the grid. This allows the user to place gates and wires
@@ -19,9 +24,10 @@ export function CircuitMapPage() {
 	const hintCanvasRef = useRef(null);
 	const [wireStart, setWireStart] = useState([null, null]);
 	// Where the user's last coordinates were
-	const [clientPos, setClientPost] = useState([0, 0]);
+	const [clientPos, setClientPos] = useState([0, 0]);
 	const [circuitBoard] = useState(new CircuitBoard(CANVAS_UNITS, CANVAS_UNITS));
-
+	const [toolInHandState, setToolInHandState] = useState("wire");
+	
 	useEffect(() => {
 		// Add a listener to detect canvas clicks
 		mainCanvasRef.current.addEventListener("mousedown", handleCanvasClick);
@@ -353,19 +359,12 @@ export function CircuitMapPage() {
 			<br />
 			<button onClick={() => {resetBoard()}}>Reset board obj</button>
 			<br />
-
-			<div>
-				<button onClick={() => toolInHand = "AND"}>AND</button>
-				<button onClick={() => toolInHand = "OR"}>OR</button>
-				<button onClick={() => toolInHand = "NOT"}>NOT</button>
-				<button onClick={() => toolInHand = "wire"}>Wire</button>
-				<button onClick={() => toolInHand = "light"}>Light</button>
-			</div>
-			<br />
-
-			<button onClick={() => {console.log(circuitBoard.objects)}}>List objects</button>
-			<button onClick={() => {circuitBoard.propogatePower()}}>Propogate</button>
-			<button onClick={refreshCanvas}>Draw canvas</button>
+			
+			
+			<input type="image" src={AND_img} alt="AND tool" onClick={() => {toolInHand = "AND"; setToolInHandState("AND");}} className={"w-[50px] h-[50px] m-[5px] rounded-lg " + (toolInHandState === "AND" ? "bg-green-500" : "bg-gray-500")}/>
+			<input type="image" src={OR_img} alt="OR tool" onClick={() => {toolInHand = "OR"; setToolInHandState("OR"); }} className={"w-[50px] h-[50px] bg-gray-500 m-[5px] rounded-lg " + (toolInHandState === "OR" ? "bg-green-500" : "bg-gray-500")}/>
+			<input type="image" src={NOT_img} alt="NOT tool" onClick={() => {toolInHand = "NOT"; setToolInHandState("NOT");}} className={"w-[50px] h-[50px] bg-gray-500 m-[5px] rounded-lg " + (toolInHandState === "NOT" ? "bg-green-500" : "bg-gray-500")}/>
+			<input type="image" src={wire_img} alt="Wire tool" onClick={() => {toolInHand = "wire"; setToolInHandState("wire");}} className={"w-[50px] h-[50px] bg-gray-500 m-[5px] rounded-lg " + (toolInHandState === "wire" ? "bg-green-500" : "bg-gray-500")}/>
 
 			<div className="relative">
 				<canvas ref={gridCanvasRef} className="bg-red-600 absolute pointer-events-none" width={CANVAS_UNITS * UNIT_SIZE} height={CANVAS_UNITS * UNIT_SIZE}></canvas>
