@@ -70,19 +70,21 @@ export function MyMapsPage() {
 	
 	return (
 		<>
-			<h1 className="text-[50px]">My Maps</h1>
-			{navigateToLogin && <Navigate to="/login" />}
-			{navigateToMap && <Navigate to="/circuitmap" />}
-			<br />
-			<ul>
-			{mapsHTML}
-			</ul>
-			<div className={"mt-[25px]"}>
-				<input type={"text"} className={"w-[400px] h-[40px] m-[5px] bg-gray-600 rounded-lg text-lg align-middle"} placeholder="map name" ref={nameFieldRef}/>
-				<button onClick={createMap} className={"w-[200px] h-[40px] m-[5px] bg-gray-500 rounded-lg text-lg overflow-hidden align-middle"}>
-					<img src={plus_img} alt={"Create map"} className={"absolute h-[30px] ml-[10px]"}/>
-					Create Map
-				</button>
+			<div className={"bg-gray-200 w-fit h-fit p-[30px] rounded-xl mx-auto mt-[30px]"}>
+				<h1 className="text-[50px]">My Maps</h1>
+				{navigateToLogin && <Navigate to="/login" />}
+				{navigateToMap && <Navigate to="/circuitmap" />}
+				<br />
+				<ul>
+				{mapsHTML}
+				</ul>
+				<div className={"mt-[25px]"}>
+					<input type={"text"} className={"w-[400px] h-[40px] m-[5px] bg-gray-600 rounded-lg text-lg align-middle pl-[5px]"} placeholder="map name" ref={nameFieldRef}/>
+					<button onClick={createMap} className={"w-[200px] h-[40px] m-[5px] bg-gray-500 rounded-lg text-lg overflow-hidden align-middle"}>
+						<img src={plus_img} alt={"Create map"} className={"absolute h-[30px] ml-[10px]"}/>
+						Create Map
+					</button>
+				</div>
 			</div>
 		</>
 	);
