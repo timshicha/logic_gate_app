@@ -1,4 +1,5 @@
 import Fastify from "fastify";
+import cors from "@fastify/cors";
 import {FastifySearchHttpMethodPlugin} from "./plugins/http_search.js";
 import LogicGateAppRoutes from "./routes/routes.js";
 import {FastifyMikroOrmPlugin} from "./plugins/mikro.js";
@@ -34,6 +35,8 @@ const envToLogger = {
 const app = Fastify({
 	logger: envToLogger[process.env.NOVE_ENV]
 });
+
+await app.register(cors, {origin: process.env.CLIENT_URL});
 
 await app.register(FastifySearchHttpMethodPlugin);
 await app.register(FastifyMikroOrmPlugin, config);
