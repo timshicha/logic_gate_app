@@ -1,5 +1,14 @@
 import { httpClient } from "@/Services/HttpClient.tsx";
 
+export async function CreateMapService(userEmail, mapTitle) {
+	const data = {
+		email: userEmail,
+		mapTitle: mapTitle
+	};
+	const response = await httpClient.post(import.meta.env.API_URL + "/circuitmaps", data);
+	return response;
+}
+
 export async function UpdateMapService(userEmail, mapTitle, newMapAsJsonStr) {
 	const data = {
 		email: userEmail,

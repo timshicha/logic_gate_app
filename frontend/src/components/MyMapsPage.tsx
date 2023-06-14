@@ -1,7 +1,8 @@
-import {RetriveAllMapsService, DeleteMapService} from "@/Services/MapServices.tsx";
-import React, {useEffect, useState} from "react";
+import {RetriveAllMapsService, DeleteMapService, CreateMapService} from "@/Services/MapServices.tsx";
+import React, {useEffect, useRef, useState} from "react";
 import {Navigate} from "react-router-dom";
 import delete_img from "@/assets/images/delete.svg";
+import plus_img from "@/assets/images/plus.svg";
 
 export function MyMapsPage() {
 	
@@ -15,6 +16,7 @@ export function MyMapsPage() {
 	const [mapTitles] = useState([]);
 	const [mapsHTML, setMapsHTML] = useState(<></>);
 	const [navigateToMap, setNavigateToMap] = useState(false);
+	const nameFieldRef = useRef(null);
 	
 	useEffect(() => {
 		getMapList();
@@ -48,6 +50,12 @@ export function MyMapsPage() {
 		await getMapList();
 	}
 	
+	async function createMap() {
+		const mapTitle = nameFieldRef.current.value;
+		await CreateMapService(email, mapTitle);
+		await getMapList();
+	}
+	
 	function createHTMLCode() {
 		setMapsHTML(
 			<>
@@ -69,6 +77,13 @@ export function MyMapsPage() {
 			<ul>
 			{mapsHTML}
 			</ul>
+			<div className={"mt-[25px]"}>
+				<input type={"text"} className={"w-[400px] h-[40px] m-[5px] bg-gray-600 rounded-lg text-lg align-middle"} placeholder="map name" ref={nameFieldRef}/>
+				<button onClick={createMap} className={"w-[200px] h-[40px] m-[5px] bg-gray-500 rounded-lg text-lg overflow-hidden align-middle"}>
+					<img src={plus_img} alt={"Create map"} className={"absolute h-[30px] ml-[10px]"}/>
+					Create Map
+				</button>
+			</div>
 		</>
 	);
 }
