@@ -36,7 +36,10 @@ const app = Fastify({
 	logger: envToLogger[process.env.NOVE_ENV]
 });
 
-await app.register(cors, {origin: process.env.CLIENT_URL});
+await app.register(cors, {
+	origin: process.env.CLIENT_URL,
+	methods: ['GET','POST','PUT','DELETE','PATCH','SEARCH']
+});
 
 await app.register(FastifySearchHttpMethodPlugin);
 await app.register(FastifyMikroOrmPlugin, config);
