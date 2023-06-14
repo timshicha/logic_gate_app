@@ -11,10 +11,9 @@ export function HomePage() {
 		const params = new URLSearchParams(paramsStr);
 		
 		if(params.get("access_token")) {
-			console.log(params.get("access_token"));
+			localStorage.setItem("access_token", params.get("access_token"))
 			window.history.replaceState(null, null, "/");
 		}
-		
 	}, []);
 	
 	return (
