@@ -66,7 +66,11 @@ export function CircuitMapRoutesInit(app: FastifyInstance) {
 		try {
 			// Find user
 			const user = await req.em.findOne(User, {email: email}, {populate: ["circuitMaps"]});
-			return user.circuitMaps;
+			let maps = [];
+			for (let i of user.circuitMaps) {
+				maps.push(i.title);
+			}
+			return maps;
 		} catch (err) {
 			reply.status(500).send(err);
 		}
