@@ -401,7 +401,7 @@ export function CircuitMapPage() {
 			<input type="image" src={NOT_img} alt="NOT tool" onClick={() => {toolInHand = "NOT"; setToolInHandState("NOT");}} className={"w-[50px] h-[50px] m-[5px] rounded-lg " + (toolInHandState === "NOT" ? "bg-green-500" : "bg-gray-500")}/>
 			<input type="image" src={wire_img} alt="Wire tool" onClick={() => {toolInHand = "wire"; setToolInHandState("wire");}} className={"w-[50px] h-[50px] m-[5px] rounded-lg " + (toolInHandState === "wire" ? "bg-green-500" : "bg-gray-500")}/>
 			
-			<div className={"relative block mb-[" + (CANVAS_UNITS * UNIT_SIZE).toString() + "px]"}>
+			<div className={"relative block mb-[620px]"}>
 				<canvas ref={gridCanvasRef} className="bg-red-600 absolute pointer-events-none" width={CANVAS_UNITS * UNIT_SIZE} height={CANVAS_UNITS * UNIT_SIZE}></canvas>
 				<canvas ref={mainCanvasRef} className="absolute" width={CANVAS_UNITS * UNIT_SIZE} height={CANVAS_UNITS * UNIT_SIZE}></canvas>
 				<canvas ref={hintCanvasRef} className="absolute pointer-events-none" width={CANVAS_UNITS * UNIT_SIZE} height={CANVAS_UNITS * UNIT_SIZE}></canvas>

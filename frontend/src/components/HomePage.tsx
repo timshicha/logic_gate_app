@@ -2,6 +2,11 @@ import React from "react";
 import circuit_img from "@/assets/images/circuit.svg";
 
 export function HomePage() {
+	// If there is an access token in URL params, extract it.
+	// We were redirected from Google.
+	
+	
+	
 	return (
 		<>
 			<h1 className={"block text-[50px] m-[20px] text-center"}>Welcome to Logic Page Simulator</h1>

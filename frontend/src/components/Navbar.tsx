@@ -31,7 +31,7 @@ export function Navbar() {
 					<img src={logo_img} className="w-[50px] mr-3 bg-gray-400 rounded-lg" alt="Logic Gate App Logo" />
 					<span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">Logic Gate Simulator</span>
 				</Link>
-				<div className="hidden w-full md:block md:w-auto" id="navbar-default">
+				<div className="w-full md:block md:w-auto" id="navbar-default">
 					<ul
 						className="font-medium flex flex-col p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
 						{email &&

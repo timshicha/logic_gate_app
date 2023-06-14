@@ -1,3 +1,4 @@
+import {googleLogin} from "@/Services/AuthServices.tsx";
 import React, {useEffect, useState} from "react";
 import {Navigate} from "react-router-dom";
 
@@ -13,6 +14,10 @@ export function LoginPage() {
 		window.location.reload();
 	}
 	
+	function goToogleLogin() {
+		googleLogin();
+	}
+	
 	return (
 		<>
 			{navigateToMaps &&
@@ -24,6 +29,7 @@ export function LoginPage() {
 				<input type="email" id="loginEmail" name="email" className={"w-[400px] h-[40px] m-[5px] bg-gray-600 rounded-lg text-lg align-middle"}/>
 				<button type={"submit"} className={"block w-[200px] h-[40px] m-[15px] mx-auto bg-gray-500 rounded-lg text-lg"}>Login</button>
 			</form>
+			<button onClick={goToogleLogin}>Google login</button>
 		</>
 	);
 }

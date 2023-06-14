@@ -61,6 +61,9 @@ export function CircuitMapRoutesInit(app: FastifyInstance) {
 	
 	// Find all maps that belong to a user
 	app.search("/circuitmaps/all", async(req, reply) => {
+		console.log("Logged in:");
+		console.log(req.oidc);
+		console.log(":");
 		// @ts-ignore
 		const { email } = req.body;
 		try {
