@@ -15,7 +15,7 @@ const CANVAS_UNITS = 40;
 const UNIT_SIZE = 15;
 let toolInHand = "wire";
 const switchPositions = [[2, 5], [2, 15], [2, 25], [2, 35]];
-const lightPosition = [20, CANVAS_UNITS - 2];
+const lightPosition = [CANVAS_UNITS - 2, 20];
 
 export function CircuitMapPage() {
 
@@ -29,6 +29,10 @@ export function CircuitMapPage() {
 	const [toolInHandState, setToolInHandState] = useState("wire");
 	
 	useEffect(() => {
+		resetBoard();
+		resetCanvas(mainCanvasRef.current);
+		refreshCanvas();
+		
 		// Add a listener to detect canvas clicks
 		mainCanvasRef.current.addEventListener("mousedown", handleCanvasClick);
 		mainCanvasRef.current.addEventListener("mousemove", event => handleCanvasMove(event));
@@ -45,7 +49,7 @@ export function CircuitMapPage() {
 			circuitBoard.addSwitch(currentSwitch[1], currentSwitch[0]);
 		}
 		// Add light
-		circuitBoard.addObject("light", lightPosition[0], lightPosition[1]);
+		circuitBoard.addObject("light", lightPosition[1], lightPosition[0]);
 	}
 
 	// Remove all gates and wires from canvas
@@ -210,6 +214,7 @@ export function CircuitMapPage() {
 			const currentSwitch = circuitBoard.switches[i];
 			drawSwitch(canvas, currentSwitch[1], currentSwitch[0], letters[i], currentSwitch[2]);
 		}
+		// draw(canvas, "light", lightPosition[0], lightPosition[1], null, null, circuitBoard.power[lightPosition[1]][lightPosition[0]], false);
 	}
 
 	// Draw a switch on the canvas
@@ -355,9 +360,7 @@ export function CircuitMapPage() {
 		<>
 			Circuit Map Page
 			<br />
-			<button onClick={() => {resetCanvas(mainCanvasRef.current)}}>Setup board</button>
-			<br />
-			<button onClick={() => {resetBoard()}}>Reset board obj</button>
+			<button onClick={() => {resetBoard(); refreshCanvas();}}>Clear board</button>
 			<br />
 			
 			
