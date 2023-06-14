@@ -24,10 +24,9 @@ export function CircuitMapPage() {
 	// Check the user's current map name.
 	// If one exists, that's the map they'll load. Otherwise,
 	// redirect them home.
-	let currentMapName = sessionStorage.getItem("currentMap");
+	let currentMapName = sessionStorage.getItem("mapTitle");
 	if(currentMapName == null) {
-		currentMapName = "Untitled Map";
-		// return <Navigate to="/" />;
+		return <Navigate to="/" />;
 	}
 
 	const [mapTitle, setMapTitle] = useState(currentMapName);
@@ -43,7 +42,7 @@ export function CircuitMapPage() {
 	useEffect(() => {
 		resetBoard();
 		resetCanvas(mainCanvasRef.current);
-		// loadCircuitFromCloud();
+		loadCircuitFromCloud();
 		
 		// Add a listener to detect canvas clicks
 		mainCanvasRef.current.addEventListener("mousedown", handleCanvasClick);
@@ -373,15 +372,12 @@ export function CircuitMapPage() {
 	async function saveCircuitToCloud() {
 		await fetch(import.meta.env.API_URL);
 		const email = localStorage.getItem("email");
-		const mapTitle = document.getElementById("b").value;
-		const newMap = document.getElementById("c").value;
 		const json = circuitBoard.boardToJson();
 		await UpdateMapService(email, mapTitle, json);
 	}
 	
 	async function loadCircuitFromCloud() {
 		const email = localStorage.getItem("email");
-		const mapTitle = document.getElementById("b").value;
 		const result = await RetrieveMapService(email, mapTitle);
 		const json = result.data.circuitMap;
 		// If the json is very short, then the map wasn't set up. Provide them with
@@ -398,12 +394,6 @@ export function CircuitMapPage() {
 	return (
 		<>
 			<h1 className="text-[50px]">{mapTitle}</h1>
-			
-			Email: <input type={"text"} id={"a"}/>
-			<br />
-			Map title: <input type={"text"} id={"b"}/>
-			<br />
-			New map: <input type={"text"} id={"c"}/>
 			<br />
 			
 			<input type="image" src={AND_img} alt="AND tool" onClick={() => {toolInHand = "AND"; setToolInHandState("AND");}} className={"w-[50px] h-[50px] m-[5px] rounded-lg " + (toolInHandState === "AND" ? "bg-green-500" : "bg-gray-500")}/>

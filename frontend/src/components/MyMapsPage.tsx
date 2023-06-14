@@ -10,6 +10,7 @@ export function MyMapsPage() {
 	// Otherwise, try loading maps
 	const [mapTitles] = useState([]);
 	const [mapsHTML, setMapsHTML] = useState(<></>);
+	const [navigateToMap, setNavigateToMap] = useState(false);
 	
 	useEffect(() => {
 		getMapList();
@@ -33,10 +34,15 @@ export function MyMapsPage() {
 		}
 	}
 	
+	function goToMapPage(mapTitle) {
+		sessionStorage.setItem("mapTitle", mapTitle);
+		setNavigateToMap(true);
+	}
+	
 	function createHTMLCode() {
 		setMapsHTML(
 			<>
-				{mapTitles.map((title) => <li>{title}</li>)}
+				{mapTitles.map((title) => <li><button onClick={() => goToMapPage(title)}>{title}</button></li>)}
 				</>
 		);
 	}
@@ -44,6 +50,7 @@ export function MyMapsPage() {
 	return (
 		<>
 			{navigateToLogin && <Navigate to="/login" />}
+			{navigateToMap && <Navigate to="/circuitmap" />}
 			My Maps Page
 			<br />
 			{mapsHTML}
