@@ -1,5 +1,5 @@
 import {RetriveAllMapsService} from "@/Services/MapServices.tsx";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Navigate} from "react-router-dom";
 
 export function MyMapsPage() {
@@ -9,7 +9,11 @@ export function MyMapsPage() {
 	const [navigateToLogin, setNavigateToLogin] = useState(email ? false : true);
 	// Otherwise, try loading maps
 	const [mapTitles] = useState([]);
-	getMapList();
+	const [mapsHTML, setMapsHTML] = useState(<></>);
+	
+	useEffect(() => {
+		getMapList();
+	}, []);
 	
 	
 	async function getMapList() {
@@ -22,10 +26,19 @@ export function MyMapsPage() {
 				mapTitles.push(i);
 			}
 			console.log(mapTitles);
+			createHTMLCode();
 		} catch(err) {
 			localStorage.removeItem("email");
 			setNavigateToLogin(true);
 		}
+	}
+	
+	function createHTMLCode() {
+		setMapsHTML(
+			<>
+				{mapTitles.map((title) => <li>{title}</li>)}
+				</>
+		);
 	}
 	
 	return (
@@ -33,6 +46,7 @@ export function MyMapsPage() {
 			{navigateToLogin && <Navigate to="/login" />}
 			My Maps Page
 			<br />
+			{mapsHTML}
 		</>
 	);
 }
