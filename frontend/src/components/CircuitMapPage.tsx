@@ -1,3 +1,4 @@
+import {Navbar} from "@/components/Navbar.tsx";
 import {RetrieveMapService, UpdateMapService} from "@/Services/MapServices.tsx";
 import React, { Component, useEffect, useRef, useState } from "react";
 import { COLORS } from "@/utils/constants.tsx";
@@ -393,6 +394,7 @@ export function CircuitMapPage() {
 
 	return (
 		<>
+			<Navbar />
 			<h1 className="text-[50px]">{mapTitle}</h1>
 			<br />
 			

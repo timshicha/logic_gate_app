@@ -9,7 +9,6 @@ export function Navbar() {
 	const [navigateHome, setNavigateHome] = useState(false);
 	
 	useEffect(() => {
-		console.log("fire");
 		if(email != localStorage.getItem("email")) {
 			setEmail(localStorage.getItem("email"));
 		}
@@ -19,12 +18,12 @@ export function Navbar() {
 		setEmail(null);
 		localStorage.removeItem("email");
 		setNavigateHome(true);
-		window.location.reload();
 	}
 	
 	return (
 		<>
-		{/* The structure of the navbar below was copied from here: https://flowbite.com/docs/components/navbar */}
+			{navigateHome && <Navigate to="/" />}
+			{/* The structure of the navbar below was copied from here: https://flowbite.com/docs/components/navbar */}
 		<nav className="bg-white border-gray-200 dark:bg-gray-900">
 			<div className="flex flex-wrap items-center justify-between mx-auto p-4">
 				<Link to="/" className="flex items-center">
@@ -70,7 +69,6 @@ export function Navbar() {
 				</div>
 			</div>
 		</nav>
-			{navigateHome && <Navigate to="/" />}
 	</>
 	);
 }

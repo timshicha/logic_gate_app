@@ -1,14 +1,17 @@
+import {Navbar} from "@/components/Navbar.tsx";
 import {httpClient} from "@/Services/HttpClient.tsx";
-import React, {useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import circuit_img from "@/assets/images/circuit.svg";
 
 export function HomePage() {
+	const [rerender, setRerender] = useState(false);
 	
 	useEffect(() => {
 		// If there is an access token in URL params, extract it.
 		// We were redirected from Google.
 		const paramsStr = "?" + window.location.href.replace(import.meta.env.CLIENT_URL, "").replace("/", "").replace("#", "");
 		const params = new URLSearchParams(paramsStr);
+		
 		
 		if(params.get("access_token")) {
 			try {
@@ -21,18 +24,18 @@ export function HomePage() {
 					});
 					localStorage.setItem("email", email);
 					window.history.replaceState(null, null, "/");
-					window.location.reload();
+					setRerender(!rerender);
 				});
 			} catch (err) {
 				window.history.replaceState(null, null, "/");
-				window.location.reload();
 			}
-
+			// Force rerender
 		}
-	}, []);
+	});
 	
 	return (
 		<>
+			<Navbar />
 			<h1 className={"block text-[50px] m-[20px] text-center"}>Welcome to Logic Page Simulator</h1>
 			<hr className={"border-[5px]"}/>
 			

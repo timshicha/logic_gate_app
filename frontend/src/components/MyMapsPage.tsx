@@ -1,3 +1,4 @@
+import {Navbar} from "@/components/Navbar.tsx";
 import {RetriveAllMapsService, DeleteMapService, CreateMapService} from "@/Services/MapServices.tsx";
 import React, {useEffect, useRef, useState} from "react";
 import {Navigate} from "react-router-dom";
@@ -32,7 +33,6 @@ export function MyMapsPage() {
 			for (let i of result.data) {
 				mapTitles.push(i);
 			}
-			console.log(mapTitles);
 			createHTMLCode();
 		} catch(err) {
 			localStorage.removeItem("email");
@@ -52,7 +52,11 @@ export function MyMapsPage() {
 	
 	async function createMap() {
 		const mapTitle = nameFieldRef.current.value;
-		await CreateMapService(email, mapTitle);
+		try {
+			await CreateMapService(email, mapTitle);
+		} catch(err) {
+			alert("Error creating map. This may be because another user already has a map with the same title.");
+		}
 		await getMapList();
 	}
 	
@@ -70,6 +74,7 @@ export function MyMapsPage() {
 	
 	return (
 		<>
+			<Navbar />
 			<div className={"bg-gray-200 w-fit h-fit p-[30px] rounded-xl mx-auto mt-[30px]"}>
 				<h1 className="text-[50px]">My Maps</h1>
 				{navigateToLogin && <Navigate to="/login" />}
