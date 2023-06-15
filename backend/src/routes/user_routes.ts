@@ -6,12 +6,17 @@ export function UserRoutesInit(app: FastifyInstance) {
 	app.post("/users", async (req, reply) => {
 		// @ts-ignore
 		const { email } = req.body;
-		// Make sure this user does not already exist
+		// If user already exists, simply ignore request
 		try {
+			const user = await req.em.findOne(User, {
+				email
+			});
+			if(user) {
+				return reply.send(user);
+			}
 			const newUser = await req.em.create(User, {
 				email
 			});
-			
 			await req.em.flush();
 			return reply.send(newUser);
 		} catch (err) {

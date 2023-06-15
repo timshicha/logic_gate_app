@@ -1,6 +1,6 @@
+import {httpClient} from "@/Services/HttpClient.tsx";
 import React, {useEffect} from "react";
 import circuit_img from "@/assets/images/circuit.svg";
-import {useSearchParams} from "react-router-dom";
 
 export function HomePage() {
 	
@@ -11,8 +11,23 @@ export function HomePage() {
 		const params = new URLSearchParams(paramsStr);
 		
 		if(params.get("access_token")) {
-			localStorage.setItem("access_token", params.get("access_token"))
-			window.history.replaceState(null, null, "/");
+			try {
+				fetch("https://www.googleapis.com/oauth2/v1/userinfo?access_token=" + params.get("access_token"))
+					.then(res => res.json()).then(async res => {
+					const email = res.email;
+					// Try loggin into app now
+					const response = await httpClient.post(import.meta.env.API_URL + "/users", {
+						email: email
+					});
+					localStorage.setItem("email", email);
+					window.history.replaceState(null, null, "/");
+					window.location.reload();
+				});
+			} catch (err) {
+				window.history.replaceState(null, null, "/");
+				window.location.reload();
+			}
+
 		}
 	}, []);
 	
