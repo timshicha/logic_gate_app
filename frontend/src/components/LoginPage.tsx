@@ -17,7 +17,7 @@ export function LoginPage() {
 			});
 			localStorage.setItem("email", email);
 			setNavigateToHome(true);
-			window.location.reload();
+			// window.location.reload();
 		} catch(err) {
 			console.log(err);
 		}
