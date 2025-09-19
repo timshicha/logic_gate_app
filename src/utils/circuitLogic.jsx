@@ -1,12 +1,6 @@
 
 export class CircuitBoard {
 
-    public objects;
-    public power;
-    public switches;
-    public width;
-    public height;
-
     constructor(width, height) {
         this.width = width;
         this.height = height;
@@ -14,11 +8,11 @@ export class CircuitBoard {
         this.resetBoard();
     }
 
-    public addSwitch = (x, y) => {
+    addSwitch = (x, y) => {
         this.switches.push([x, y, 0]);
     }
 
-    public toggleSwitch = (switchX, switchhY, switchPower: 0 | 1 | null = null) => {
+    toggleSwitch = (switchX, switchhY, switchPower = null) => {
         // Find the switch
         for (let currentSwitch of this.switches) {
             if(currentSwitch[0] === switchX && currentSwitch[1] === switchhY) {
@@ -40,7 +34,7 @@ export class CircuitBoard {
         console.log("Switch to toggle not found.");
     }
 
-    public addObject = (obj, x, y, x2=null, y2=null) => {
+    addObject = (obj, x, y, x2=null, y2=null) => {
         if(obj === "wire") {
             this.objects[x][y].push(["wire", x2, y2, 0]);
             this.objects[x2][y2].push(["wire", x, y, 0]);
@@ -50,7 +44,7 @@ export class CircuitBoard {
         }
     }
 
-    public resetPower = () => {
+    resetPower = () => {
         for (let i = 0; i < this.power.length; i++) {
             for (let j = 0; j < this.power[0].length; j++) {
                 this.power[i][j] = 0;
@@ -61,7 +55,7 @@ export class CircuitBoard {
         }
     }
 
-    public propogatePower = () => {
+    propogatePower = () => {
         this.resetPower();
 
         // Start by sending signals from the switches:
@@ -159,7 +153,7 @@ export class CircuitBoard {
         return true;
     }
 
-    public resetBoard = () => {
+    resetBoard = () => {
         this.objects = new Array(this.height);
         this.power = new Array(this.height);
         for (let i = 0; i < this.height; i++) {
@@ -173,7 +167,7 @@ export class CircuitBoard {
         this.switches = [];
     }
     
-    public boardToJson = () => {
+    boardToJson = () => {
         const data = {
             objects: this.objects,
             switches: this.switches
@@ -181,7 +175,7 @@ export class CircuitBoard {
         return JSON.stringify(data);
     }
     
-    public JsonToBoard = (jsonStr) => {
+    JsonToBoard = (jsonStr) => {
         const data = JSON.parse(jsonStr);
         this.objects = data.objects;
         this.switches = data.switches;

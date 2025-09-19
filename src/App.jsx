@@ -1,7 +1,5 @@
 import React from "react";
-import { Circuit } from "./components/Circuit";
-import "./index.css";
-
+import Circuit from "./components/Circuit.jsx";
 
 const App = () => {
 

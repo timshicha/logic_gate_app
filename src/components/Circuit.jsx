@@ -1,6 +1,6 @@
 import React, { Component, useEffect, useRef, useState } from "react";
-import { COLORS } from "../utils/constants.tsx";
-import { CircuitBoard } from "../utils/circuitLogic.tsx";
+import { COLORS } from "../utils/constants.jsx";
+import { CircuitBoard } from "../utils/circuitLogic.jsx";
 import AND_img from "../assets/images/AND.svg";
 import OR_img from "../assets/images/OR.svg";
 import NOT_img from "../assets/images/NOT.svg";
@@ -17,7 +17,7 @@ let toolInHand = "wire";
 const switchPositions = [[2, 5], [2, 15], [2, 25], [2, 35]];
 const lightPosition = [CANVAS_UNITS - 2, 20];
 
-export function Circuit() {
+const Circuit = () => {
     
     // Check the user's current map name.
     // If one exists, that's the map they'll load. Otherwise,
@@ -36,7 +36,7 @@ export function Circuit() {
     
     useEffect(() => {
         resetBoard();
-        resetCanvas(mainCanvasRef.current);
+        resetCanvas();
         
         // Add a listener to detect canvas clicks
         mainCanvasRef.current.addEventListener("mousedown", handleCanvasClick);
@@ -60,9 +60,9 @@ export function Circuit() {
     }
 
     // Remove all gates and wires from canvas
-    function resetCanvas(canvas) {
+    function resetCanvas() {
         // Draw the grid lines on the grid canvas
-        function drawCanvasGridLines(color) {
+        function drawCanvasGridLines() {
             const context = gridCanvasRef.current.getContext("2d");
             context.reset();
             context.beginPath();
@@ -76,15 +76,15 @@ export function Circuit() {
                 context.moveTo(i * UNIT_SIZE, 0);
                 context.lineTo(i * UNIT_SIZE, CANVAS_UNITS * UNIT_SIZE);
             }
-            context.strokeStyle = color;
+            context.strokeStyle = COLORS.BLACK;
             context.lineWidth = 0.1;
             context.stroke();
         }
 
-        drawCanvasGridLines(gridCanvasRef.current);
-        const context = canvas.getContext("2d");
+        const context = gridCanvasRef.current.getContext("2d");
         context.clearRect(0, 0, gridCanvasRef.current.width, gridCanvasRef.current.height);
         context.reset();
+        drawCanvasGridLines();
     }
 
     // Given two coordinates on the canvas, find the nearest grid intersection and
@@ -182,6 +182,7 @@ export function Circuit() {
     // Draw the circuit in the CircuitBoard object on to the canvas.
     // Note: the canvas will be reset first.
     function refreshCanvas() {
+        resetCanvas();
         const canvas = mainCanvasRef.current;
         const context = canvas.getContext("2d");
         context.reset();
@@ -374,7 +375,7 @@ export function Circuit() {
             <input type="image" src={wire_img} alt="Wire tool" onClick={() => {toolInHand = "wire"; setToolInHandState("wire");}} className={"w-[50px] h-[50px] m-[5px] rounded-lg " + (toolInHandState === "wire" ? "bg-green-500" : "bg-gray-500")}/>
             
             <div className={"relative block mb-[620px]"}>
-                <canvas ref={gridCanvasRef} className="bg-red-600 absolute pointer-events-none" width={CANVAS_UNITS * UNIT_SIZE} height={CANVAS_UNITS * UNIT_SIZE}></canvas>
+                <canvas ref={gridCanvasRef} className="absolute pointer-events-none" width={CANVAS_UNITS * UNIT_SIZE} height={CANVAS_UNITS * UNIT_SIZE}></canvas>
                 <canvas ref={mainCanvasRef} className="absolute" width={CANVAS_UNITS * UNIT_SIZE} height={CANVAS_UNITS * UNIT_SIZE}></canvas>
                 <canvas ref={hintCanvasRef} className="absolute pointer-events-none" width={CANVAS_UNITS * UNIT_SIZE} height={CANVAS_UNITS * UNIT_SIZE}></canvas>
             </div>
@@ -382,3 +383,5 @@ export function Circuit() {
         </>
     );
 }
+
+export default Circuit;
